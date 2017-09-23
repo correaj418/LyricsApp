@@ -15,6 +15,7 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.correaj418.lyricsapi.Constants.HTTP_STATUS;
 import com.correaj418.lyricsapi.LyricsApiService;
 import com.correaj418.lyricsapi.LyricsApiService.SongSearchCallback;
@@ -40,6 +41,8 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
 
     private RecyclerViewAdapter obRecyclerViewAdapter;
 
+    private MaterialDialog obLoadingDialog;
+
     //region lifecycle
 
     @Override
@@ -60,6 +63,26 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
     }
 
     //endregion
+
+    private void showLoadingDialog(String arTitle, String arContent)
+    {
+        obLoadingDialog = new MaterialDialog.Builder(this)
+                .cancelable(false)
+                .progress(true, 0)
+                .title(arTitle)
+                .content(arContent)
+                .show();
+    }
+
+    private void dismissLoadingDialog()
+    {
+        if (obLoadingDialog == null)
+        {
+            return;
+        }
+
+        obLoadingDialog.dismiss();
+    }
 
     public void initToolbar(String title)
     {
@@ -120,6 +143,8 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
             public void onSongSearchCallback(HTTP_STATUS arHttpStatus,
                                              SongsListWrapper arSongsListModel)
             {
+                dismissLoadingDialog();
+
                 Log.d(TAG, "onSongSearchCallback returned status code " + arHttpStatus);
 
                 if (arHttpStatus == HTTP_STATUS.OK)
@@ -132,6 +157,8 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
                 }
             }
         });
+
+        showLoadingDialog("Searching For Songs", "Please wait...");
 
         return false;
     }
@@ -176,12 +203,16 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
             public void onSongSearchCallback(HTTP_STATUS arHttpStatus,
                                              Lyrics arLyricsModel)
             {
+                dismissLoadingDialog();
+
                 Intent loLyricsActivityIntent = new Intent(SearchActivity.this, LyricsActivity.class)
                         .putExtra("lyrics", Parcels.wrap(arLyricsModel));
 
                 startActivity(loLyricsActivityIntent);
             }
         });
+
+        showLoadingDialog("Downloading lyrics", "Please wait...");
     }
 
     //endregion
