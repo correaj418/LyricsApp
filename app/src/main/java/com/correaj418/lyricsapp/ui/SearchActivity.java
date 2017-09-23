@@ -198,6 +198,13 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
                     {
                         dismissLoadingDialog();
 
+                        if (arLyricModel.getCompleteLyricsAsHtml().toString().isEmpty())
+                        {
+                            showMessageDialog(getString(R.string.could_not_find_lyrics));
+
+                            return;
+                        }
+
                         Intent loLyricsActivityIntent = new Intent(SearchActivity.this, LyricsActivity.class)
                                 .putExtra(LYRICS_PARCEL_KEY, Parcels.wrap(arLyricModel));
 

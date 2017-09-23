@@ -1,7 +1,5 @@
 package com.correaj418.lyricsapp.api;
 
-import android.os.Handler;
-import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
@@ -39,14 +37,10 @@ public class LyricsApiService
     private final OkHttpClient obOkHttpClient;
     private final Gson obGson;
 
-    private final Handler obMainThreadHandler;
-
     private LyricsApiService()
     {
         obOkHttpClient = new OkHttpClient();
         obGson = new Gson();
-
-        obMainThreadHandler = new Handler(Looper.getMainLooper());
     }
 
     public static LyricsApiService instance()
@@ -149,8 +143,9 @@ public class LyricsApiService
             public void onFailure(@NonNull Call arCall,
                                   @NonNull IOException arException)
             {
-                // TODO
                 Log.e(TAG, arException.getMessage());
+
+                arCallback.onSongSearchCallback(HTTP_STATUS.NETWORK_ERROR, null);
             }
 
             @Override
