@@ -6,7 +6,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.view.MenuItemCompat;
-import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AlertDialog.Builder;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -36,6 +36,8 @@ import butterknife.ButterKnife;
 public class SearchActivity extends AppCompatActivity implements SearchView.OnQueryTextListener, OnItemClickListener
 {
     private static final String TAG = SearchActivity.class.getSimpleName();
+
+    public static final String LYRICS_PARCEL_KEY = "LYRICS_PARCEL_KEY";
 
     @BindView(R.id.recycler_view)
     RecyclerView obRecyclerView;
@@ -164,7 +166,7 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
     {
         Log.e(TAG, "handleSongSearchFailure() called with status " + arHttpStatus);
 
-        showMessageDialog(getString(R.string.unknown_error));
+        showMessageDialog(getString(R.string.check_internet_connection));
     }
 
     //endregion
@@ -185,13 +187,14 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
                 dismissLoadingDialog();
 
                 Intent loLyricsActivityIntent = new Intent(SearchActivity.this, LyricsActivity.class)
-                        .putExtra("lyrics", Parcels.wrap(arLyricModel));
+                        .putExtra(LYRICS_PARCEL_KEY, Parcels.wrap(arLyricModel));
 
                 startActivity(loLyricsActivityIntent);
             }
         });
 
-        showLoadingDialog("Downloading lyrics", "Please wait...");
+        showLoadingDialog(getString(R.string.downloading_lyrics),
+                getString(R.string.please_wait));
     }
 
     //endregion
@@ -208,10 +211,10 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
 
     private void showMessageDialog(String arMessage)
     {
-        new AlertDialog.Builder(this)
+        new Builder(this)
                 .setCancelable(true)
                 .setMessage(arMessage)
-                .setPositiveButton("Ok", null)
+                .setPositiveButton(R.string.ok, null)
                 .show();
     }
 

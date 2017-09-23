@@ -5,4 +5,8 @@
     <string name="please_wait">Please wait…</string>
     <string name="unknown_error">Unknown Error</string>
     <string name="no_results_found">No results found</string>
+    <string name="check_internet_connection">Request failed. Check your internet connection.</string>
+    <string name="downloading_lyrics">Downloading lyrics</string>
+    <string name="ok">Ok</string>
+    <string name="lyrics_title">Lyrics for </string>
 </resources>

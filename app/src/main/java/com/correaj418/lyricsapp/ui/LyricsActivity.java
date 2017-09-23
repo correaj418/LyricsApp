@@ -16,6 +16,8 @@ import org.parceler.Parcels;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+import static com.correaj418.lyricsapp.ui.SearchActivity.LYRICS_PARCEL_KEY;
+
 public class LyricsActivity extends AppCompatActivity
 {
     private static final String TAG = LyricsActivity.class.getSimpleName();
@@ -45,11 +47,10 @@ public class LyricsActivity extends AppCompatActivity
 
         ButterKnife.bind(this);
 
-        // TODO - const
-        Lyric loLyricModel = Parcels.unwrap(getIntent().getExtras().getParcelable("lyrics"));
+        Lyric loLyricModel = Parcels.unwrap(getIntent().getExtras().getParcelable(LYRICS_PARCEL_KEY));
 
         setSupportActionBar(obToolbar);
-        getSupportActionBar().setTitle("Lyrics for " + loLyricModel.getSongName());
+        getSupportActionBar().setTitle(getString(R.string.lyrics_title) + loLyricModel.getSongName());
 
         Picasso.with(this)
                 .load(loLyricModel.getSongModel().getAlbumArtUrl())

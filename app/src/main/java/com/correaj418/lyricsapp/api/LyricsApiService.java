@@ -74,10 +74,7 @@ public class LyricsApiService
                     @Override
                     public void run()
                     {
-
-                        // TODO - status codes
-                        // TODO - error handling
-                        arCallback.onSongSearchCallback(HTTP_STATUS.UNKNOWN_ERROR, null);
+                        arCallback.onSongSearchCallback(HTTP_STATUS.NETWORK_ERROR, null);
                     }
                 });
             }
