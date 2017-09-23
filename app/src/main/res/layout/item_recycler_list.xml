@@ -36,7 +36,7 @@
 
 
             <TextView
-                android:id="@+id/item_txt_title"
+                android:id="@+id/song_name_text_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text=""
@@ -44,7 +44,16 @@
                 android:textSize="14dp"/>
 
             <TextView
-                android:id="@+id/item_txt_message"
+                android:id="@+id/artist_name_text_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text=""
+                android:textColor="#727272"
+                android:textSize="14dp"/>
+
+            <TextView
+                android:id="@+id/album_name_text_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"

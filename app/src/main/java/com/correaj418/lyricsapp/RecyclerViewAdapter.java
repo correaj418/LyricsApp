@@ -8,24 +8,27 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.correaj418.lyricsapi.SongModel;
+import com.correaj418.lyricsapi.utilities.Log;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 {
-    private ArrayList<SongModel> obSongModels;
+    private static final String TAG = RecyclerViewAdapter.class.getSimpleName();
+
+    private List<SongModel> obSongModels;
 
     private OnItemClickListener obItemClickListener;
 
-    public RecyclerViewAdapter(ArrayList<SongModel> modelList)
+    public RecyclerViewAdapter(List<SongModel> modelList)
     {
         this.obSongModels = modelList;
     }
 
-    public void updateList(ArrayList<SongModel> arSongModels)
+    public void updateList(List<SongModel> arSongModels)
     {
         this.obSongModels = arSongModels;
         notifyDataSetChanged();
@@ -44,16 +47,18 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     public void onBindViewHolder(RecyclerView.ViewHolder arViewHolder,
                                  final int arPosition)
     {
-        //Here you can fill your row view
         if (arViewHolder instanceof ViewHolder)
         {
             final SongModel loSongModel = getItem(arPosition);
+
+            Log.v(TAG, "Binding view for song " + loSongModel.toString());
+
             ViewHolder loGenericViewHolder = (ViewHolder) arViewHolder;
 
-            loGenericViewHolder.
-
-//            loGenericViewHolder.itemTxtTitle.setText(loSongModel.getTitle());
-//            loGenericViewHolder.itemTxtMessage.setText(loSongModel.getMessage());
+//            loGenericViewHolder.obAlbumCoverImageView = TODO
+            loGenericViewHolder.obSongNameTextView.setText(loSongModel.getSongName());
+            loGenericViewHolder.obArtistNameTextView.setText(loSongModel.getArtistName());
+            loGenericViewHolder.obAlbumNameTextView.setText(loSongModel.getAlbumName());
         }
     }
 
@@ -83,11 +88,13 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     public class ViewHolder extends RecyclerView.ViewHolder
     {
         @BindView(R.id.album_cover_image_view)
-        ImageView imgUser;
-        @BindView(R.id.item_txt_title)
-        TextView itemTxtTitle;
-        @BindView(R.id.item_txt_message)
-        TextView itemTxtMessage;
+        ImageView obAlbumCoverImageView;
+        @BindView(R.id.song_name_text_view)
+        TextView obSongNameTextView;
+        @BindView(R.id.artist_name_text_view)
+        TextView obArtistNameTextView;
+        @BindView(R.id.album_name_text_view)
+        TextView obAlbumNameTextView;
 
         public ViewHolder(final View arItemView)
         {

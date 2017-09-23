@@ -14,4 +14,14 @@ public class SongsListModel
     @Expose
     @SerializedName("results")
     private List<SongModel> obSongResultsList;
+
+    public int getResultCount()
+    {
+        return obResultCount;
+    }
+
+    public List<SongModel> getSongResultsList()
+    {
+        return obSongResultsList;
+    }
 }

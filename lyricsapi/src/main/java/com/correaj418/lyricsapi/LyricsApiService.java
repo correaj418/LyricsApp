@@ -1,7 +1,10 @@
 package com.correaj418.lyricsapi;
 
-import android.util.Log;
+import android.os.Handler;
+import android.os.Looper;
 
+import com.correaj418.lyricsapi.Constants.HTTP_STATUS;
+import com.correaj418.lyricsapi.utilities.Log;
 import com.google.gson.Gson;
 
 import java.io.IOException;
@@ -13,6 +16,7 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 import static com.correaj418.lyricsapi.Constants.APPLE_API_URL;
+import static com.correaj418.lyricsapi.Constants.HTTP_STATUS.UNKNOWN_ERROR;
 
 public class LyricsApiService
 {
@@ -20,13 +24,17 @@ public class LyricsApiService
 
     private static LyricsApiService sInstance;
 
-    private OkHttpClient obOkHttpClient;
-    private Gson obGson;
+    private final OkHttpClient obOkHttpClient;
+    private final Gson obGson;
+
+    private final Handler obMainThreadHandler;
 
     private LyricsApiService()
     {
         obOkHttpClient = new OkHttpClient();
         obGson = new Gson();
+
+        obMainThreadHandler = new Handler(Looper.getMainLooper());
     }
 
     public static LyricsApiService instance()
@@ -49,23 +57,38 @@ public class LyricsApiService
             public void onFailure(Call arCall,
                                   IOException arException)
             {
-                Log.e("", arException.getMessage());
+                Log.e(TAG, arException.getMessage());
 
-                // TODO - status codes
-                // TODO - error handling
-                arCallback.onSongSearchCallback(-1, null);
+                obMainThreadHandler.post(new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+
+                        // TODO - status codes
+                        // TODO - error handling
+                        arCallback.onSongSearchCallback(UNKNOWN_ERROR, null);
+                    }
+                });
             }
 
             @Override
             public void onResponse(Call arCall,
                                    Response arResponse) throws IOException
             {
-                String loResponseJson = arResponse.body().string();
+                final String loResponseJson = arResponse.body().string();
 
-                SongsListModel loSongsModel = obGson.fromJson(loResponseJson, SongsListModel.class);
+                final SongsListModel loSongsModel = obGson.fromJson(loResponseJson, SongsListModel.class);
 
-                // TODO - status codes
-                arCallback.onSongSearchCallback(0, loSongsModel);
+                obMainThreadHandler.post(new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        // TODO - status codes
+                        arCallback.onSongSearchCallback(HTTP_STATUS.OK, loSongsModel);
+                    }
+                });
             }
         });
     }
@@ -82,7 +105,7 @@ public class LyricsApiService
 
     public interface SongSearchCallback
     {
-        void onSongSearchCallback(int arStatusCode,
+        void onSongSearchCallback(HTTP_STATUS arHttpStatus,
                                   SongsListModel arSongsListModel);
     }
 }

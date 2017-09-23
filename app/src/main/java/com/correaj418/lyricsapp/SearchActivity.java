@@ -15,15 +15,22 @@ import android.view.Menu;
 import android.view.View;
 import android.widget.EditText;
 
+import com.correaj418.lyricsapi.Constants.HTTP_STATUS;
+import com.correaj418.lyricsapi.LyricsApiService;
+import com.correaj418.lyricsapi.LyricsApiService.SongSearchCallback;
 import com.correaj418.lyricsapi.SongModel;
+import com.correaj418.lyricsapi.SongsListModel;
+import com.correaj418.lyricsapi.utilities.Log;
 
 import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class SearchActivity extends AppCompatActivity
+public class SearchActivity extends AppCompatActivity implements SearchView.OnQueryTextListener
 {
+    private static final String TAG = SearchActivity.class.getSimpleName();
+
     @BindView(R.id.recycler_view)
     RecyclerView recyclerView;
 
@@ -33,6 +40,8 @@ public class SearchActivity extends AppCompatActivity
     private RecyclerViewAdapter mAdapter;
 
     private ArrayList<SongModel> modelList = new ArrayList<>();
+
+    //region lifecycle
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -44,6 +53,16 @@ public class SearchActivity extends AppCompatActivity
         initToolbar("Lyrics");
         setAdapter();
     }
+
+    @Override
+    protected void onResume()
+    {
+        super.onResume();
+
+        onQueryTextSubmit("brand new");
+    }
+
+    //endregion
 
     public void initToolbar(String title)
     {
@@ -97,20 +116,7 @@ public class SearchActivity extends AppCompatActivity
         View v = searchView.findViewById(android.support.v7.appcompat.R.id.search_plate);
         v.setBackgroundColor(Color.TRANSPARENT);
 
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener()
-        {
-            @Override
-            public boolean onQueryTextSubmit(String arQuery)
-            {
-                return false;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String arNewContent)
-            {
-                return false;
-            }
-        });
+        searchView.setOnQueryTextListener(this);
 
         return true;
     }
@@ -138,4 +144,54 @@ public class SearchActivity extends AppCompatActivity
             }
         });
     }
+
+    //region SearchView.OnQueryTextListener
+
+    @Override
+    public boolean onQueryTextSubmit(String arQuery)
+    {
+        LyricsApiService.instance().searchForTracks(arQuery, new SongSearchCallback()
+        {
+            @Override
+            public void onSongSearchCallback(HTTP_STATUS arHttpStatus,
+                                             SongsListModel arSongsListModel)
+            {
+                Log.d(TAG, "onSongSearchCallback returned status code " + arHttpStatus);
+
+                if (arHttpStatus == HTTP_STATUS.OK)
+                {
+                    handleSongSearchResult(arSongsListModel);
+                }
+                else
+                {
+                    handleSongSearchFailure(arHttpStatus);
+                }
+            }
+        });
+
+        return false;
+    }
+
+    @Override
+    public boolean onQueryTextChange(String arNewText) { return false; }
+
+    //endregion
+
+    //region request handling
+
+    private void handleSongSearchResult(SongsListModel arSongsListModel)
+    {
+        Log.v(TAG, "handleSongSearchResult() called with " + arSongsListModel.getResultCount() + " results");
+
+        mAdapter.updateList(arSongsListModel.getSongResultsList());
+    }
+
+    private void handleSongSearchFailure(HTTP_STATUS arHttpStatus)
+    {
+        Log.e(TAG, "handleSongSearchFailure() called with status " + arHttpStatus);
+
+        // TODO
+    }
+
+    //endregion
 }
