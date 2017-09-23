@@ -1,6 +1,6 @@
-package com.correaj418.lyricsapi.models;
+package com.correaj418.lyricsapp.api.models;
 
-import com.correaj418.lyricsapi.Constants;
+import com.correaj418.lyricsapp.api.constants.Constants;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 

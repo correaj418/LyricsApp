@@ -1,4 +1,4 @@
-package com.correaj418.lyricsapp;
+package com.correaj418.lyricsapp.ui.adapters;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
@@ -8,7 +8,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.correaj418.lyricsapi.models.Song;
+import com.correaj418.lyricsapp.api.models.Song;
+import com.correaj418.lyricsapp.R;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;

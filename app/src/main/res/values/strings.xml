@@ -1,7 +1,8 @@
 <resources>
-    <string name="app_name">LyricsApp</string>
-    <string name="title_activity_search">SearchActivity</string>
-
-    <string name="hello_world">Hello world!</string>
-    <string name="title_activity_lyrics">LyricsActivity</string>
+    <string name="app_name">Lyrics</string>
+    <string name="search">Search</string>
+    <string name="searching_for_songs">Searching For Songs</string>
+    <string name="please_wait">Please wait…</string>
+    <string name="unknown_error">Unknown Error</string>
+    <string name="no_results_found">No results found</string>
 </resources>

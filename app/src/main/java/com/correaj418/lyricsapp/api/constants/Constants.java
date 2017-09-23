@@ -1,4 +1,4 @@
-package com.correaj418.lyricsapi;
+package com.correaj418.lyricsapp.api.constants;
 
 public class Constants
 {

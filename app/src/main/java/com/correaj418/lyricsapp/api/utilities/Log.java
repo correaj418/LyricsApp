@@ -1,4 +1,4 @@
-package com.correaj418.lyricsapi.utilities;
+package com.correaj418.lyricsapp.api.utilities;
 
 public class Log
 {

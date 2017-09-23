@@ -1,13 +1,14 @@
-package com.correaj418.lyricsapi;
+package com.correaj418.lyricsapp.api;
 
 import android.os.Handler;
 import android.os.Looper;
 
-import com.correaj418.lyricsapi.Constants.HTTP_STATUS;
-import com.correaj418.lyricsapi.models.Lyric;
-import com.correaj418.lyricsapi.models.Song;
-import com.correaj418.lyricsapi.models.Song.SongsListWrapper;
-import com.correaj418.lyricsapi.utilities.Log;
+import com.correaj418.lyricsapp.api.constants.Constants;
+import com.correaj418.lyricsapp.api.constants.Constants.HTTP_STATUS;
+import com.correaj418.lyricsapp.api.models.Lyric;
+import com.correaj418.lyricsapp.api.models.Song;
+import com.correaj418.lyricsapp.api.models.Song.SongsListWrapper;
+import com.correaj418.lyricsapp.api.utilities.Log;
 import com.google.gson.Gson;
 
 import org.jsoup.Jsoup;
@@ -22,12 +23,9 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
-import static com.correaj418.lyricsapi.Constants.APPLE_API_URL;
-import static com.correaj418.lyricsapi.Constants.HTTP_STATUS.OK;
-import static com.correaj418.lyricsapi.Constants.HTTP_STATUS.UNKNOWN_ERROR;
-import static com.correaj418.lyricsapi.LyricsApiService.REQUEST_TYPE.APPLE_API_REQUEST;
-import static com.correaj418.lyricsapi.LyricsApiService.REQUEST_TYPE.FULL_LYRICS_REQUEST;
-import static com.correaj418.lyricsapi.LyricsApiService.REQUEST_TYPE.LYRICS_REQUEST;
+import static com.correaj418.lyricsapp.api.LyricsApiService.REQUEST_TYPE.APPLE_API_REQUEST;
+import static com.correaj418.lyricsapp.api.LyricsApiService.REQUEST_TYPE.FULL_LYRICS_REQUEST;
+import static com.correaj418.lyricsapp.api.LyricsApiService.REQUEST_TYPE.LYRICS_REQUEST;
 
 public class LyricsApiService
 {
@@ -61,7 +59,7 @@ public class LyricsApiService
     public void searchForTracks(String arSearchTerm,
                                 final SongSearchCallback<SongsListWrapper> arCallback)
     {
-        String loUrl = String.format(APPLE_API_URL, arSearchTerm);
+        String loUrl = String.format(Constants.APPLE_API_URL, arSearchTerm);
         sendRequest(loUrl, APPLE_API_REQUEST, new Callback()
         {
             @Override
@@ -78,7 +76,7 @@ public class LyricsApiService
 
                         // TODO - status codes
                         // TODO - error handling
-                        arCallback.onSongSearchCallback(UNKNOWN_ERROR, null);
+                        arCallback.onSongSearchCallback(HTTP_STATUS.UNKNOWN_ERROR, null);
                     }
                 });
             }
@@ -123,7 +121,7 @@ public class LyricsApiService
 
                         // TODO - status codes
                         // TODO - error handling
-                        arCallback.onSongSearchCallback(UNKNOWN_ERROR, null);
+                        arCallback.onSongSearchCallback(HTTP_STATUS.UNKNOWN_ERROR, null);
                     }
                 });
             }
@@ -220,7 +218,7 @@ public class LyricsApiService
             {
                 // TODO - status codes
 
-                arCallback.onSongSearchCallback(OK, arLoLyricModel);
+                arCallback.onSongSearchCallback(HTTP_STATUS.OK, arLoLyricModel);
             }
         });
     }

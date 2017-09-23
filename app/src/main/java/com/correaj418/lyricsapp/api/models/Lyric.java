@@ -1,4 +1,4 @@
-package com.correaj418.lyricsapi.models;
+package com.correaj418.lyricsapp.api.models;
 
 import android.text.Html;
 import android.text.Spanned;

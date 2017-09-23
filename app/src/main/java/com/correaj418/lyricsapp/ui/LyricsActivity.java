@@ -1,4 +1,4 @@
-package com.correaj418.lyricsapp;
+package com.correaj418.lyricsapp.ui;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -6,8 +6,9 @@ import android.support.v7.widget.Toolbar;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.correaj418.lyricsapi.models.Lyric;
-import com.correaj418.lyricsapi.utilities.Log;
+import com.correaj418.lyricsapp.api.models.Lyric;
+import com.correaj418.lyricsapp.api.utilities.Log;
+import com.correaj418.lyricsapp.R;
 import com.squareup.picasso.Picasso;
 
 import org.parceler.Parcels;

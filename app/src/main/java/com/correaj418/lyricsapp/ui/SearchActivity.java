@@ -1,10 +1,12 @@
-package com.correaj418.lyricsapp;
+package com.correaj418.lyricsapp.ui;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.view.MenuItemCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -15,21 +17,23 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
-import com.afollestad.materialdialogs.MaterialDialog;
-import com.correaj418.lyricsapi.Constants.HTTP_STATUS;
-import com.correaj418.lyricsapi.LyricsApiService;
-import com.correaj418.lyricsapi.LyricsApiService.SongSearchCallback;
-import com.correaj418.lyricsapi.models.Lyric;
-import com.correaj418.lyricsapi.models.Song;
-import com.correaj418.lyricsapi.models.Song.SongsListWrapper;
-import com.correaj418.lyricsapi.utilities.Log;
+import com.correaj418.lyricsapp.api.constants.Constants.HTTP_STATUS;
+import com.correaj418.lyricsapp.api.LyricsApiService;
+import com.correaj418.lyricsapp.api.LyricsApiService.SongSearchCallback;
+import com.correaj418.lyricsapp.api.models.Lyric;
+import com.correaj418.lyricsapp.api.models.Song;
+import com.correaj418.lyricsapp.api.models.Song.SongsListWrapper;
+import com.correaj418.lyricsapp.api.utilities.Log;
+import com.correaj418.lyricsapp.R;
+import com.correaj418.lyricsapp.ui.adapters.RecyclerViewAdapter;
+import com.correaj418.lyricsapp.ui.adapters.RecyclerViewAdapter.OnItemClickListener;
 
 import org.parceler.Parcels;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class SearchActivity extends AppCompatActivity implements SearchView.OnQueryTextListener, RecyclerViewAdapter.OnItemClickListener
+public class SearchActivity extends AppCompatActivity implements SearchView.OnQueryTextListener, OnItemClickListener
 {
     private static final String TAG = SearchActivity.class.getSimpleName();
 
@@ -41,7 +45,7 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
 
     private RecyclerViewAdapter obRecyclerViewAdapter;
 
-    private MaterialDialog obLoadingDialog;
+    private ProgressDialog obLoadingDialog;
 
     //region lifecycle
 
@@ -58,34 +62,18 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
         initToolbar();
 
         setAdapter();
+
+        // TODO
+        onQueryTextSubmit("brand new");
     }
 
     //endregion
 
-    private void showLoadingDialog(String arTitle, String arContent)
-    {
-        obLoadingDialog = new MaterialDialog.Builder(this)
-                .cancelable(false)
-                .progress(true, 0)
-                .title(arTitle)
-                .content(arContent)
-                .show();
-    }
-
-    private void dismissLoadingDialog()
-    {
-        if (obLoadingDialog == null)
-        {
-            return;
-        }
-
-        obLoadingDialog.dismiss();
-    }
-
     public void initToolbar()
     {
         setSupportActionBar(obToolbar);
-        getSupportActionBar().setTitle("Lyrics");
+        //noinspection ConstantConditions
+        getSupportActionBar().setTitle(R.string.app_name);
     }
 
     @Override
@@ -103,7 +91,7 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
         searchEdit.setTextColor(Color.WHITE);
         searchEdit.setHintTextColor(Color.WHITE);
         searchEdit.setBackgroundColor(Color.TRANSPARENT);
-        searchEdit.setHint("Search");
+        searchEdit.setHint(R.string.search);
 
         searchView.setOnQueryTextListener(this);
 
@@ -153,7 +141,7 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
             }
         });
 
-        showLoadingDialog("Searching For Songs", "Please wait...");
+        showLoadingDialog(getString(R.string.searching_for_songs), getString(R.string.please_wait));
 
         return false;
     }
@@ -172,13 +160,18 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
         obRecyclerView.scrollToPosition(0);
 
         obRecyclerViewAdapter.updateList(arSongsListModel.getSongResultsList());
+
+        if (arSongsListModel.getResultCount() == 0)
+        {
+            showMessageDialog(getString(R.string.no_results_found));
+        }
     }
 
     private void handleSongSearchFailure(HTTP_STATUS arHttpStatus)
     {
         Log.e(TAG, "handleSongSearchFailure() called with status " + arHttpStatus);
 
-        // TODO
+        showMessageDialog(getString(R.string.unknown_error));
     }
 
     //endregion
@@ -188,8 +181,6 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
     @Override
     public void onItemClick(View arView, int arPosition, Song arModel)
     {
-        //handle item click events here
-        // TODO - handle click
         Log.v(TAG, "onItemClick for song " + arModel.toString());
 
         LyricsApiService.instance().searchForLyrics(arModel, new SongSearchCallback<Lyric>()
@@ -219,4 +210,33 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
         InputMethodManager loInputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         loInputMethodManager.hideSoftInputFromWindow(obRecyclerView.getWindowToken(), 0);
     }
+
+    //region dialogs
+
+    private void showMessageDialog(String arMessage)
+    {
+        new AlertDialog.Builder(this)
+                .setCancelable(true)
+                .setMessage(arMessage)
+                .setPositiveButton("Ok", null)
+                .show();
+    }
+
+    private void showLoadingDialog(String arTitle, String arMessage)
+    {
+        obLoadingDialog = ProgressDialog
+                .show(this, arTitle, arMessage, true);
+    }
+
+    private void dismissLoadingDialog()
+    {
+        if (obLoadingDialog == null)
+        {
+            return;
+        }
+
+        obLoadingDialog.dismiss();
+    }
+
+    //endregion
 }

@@ -2,6 +2,8 @@
 <manifest package="com.correaj418.lyricsapp"
           xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <uses-permission android:name="android.permission.INTERNET"/>
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -10,8 +12,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".SearchActivity"
-            android:label="@string/title_activity_search"
+            android:name=".ui.SearchActivity"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.Template.Base">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
@@ -20,13 +22,13 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".LyricsActivity"
-            android:label="@string/title_activity_lyrics"
-            android:parentActivityName=".SearchActivity"
+            android:name=".ui.LyricsActivity"
+            android:parentActivityName=".ui.SearchActivity"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.correaj418.lyricsapp.SearchActivity"/>
+                android:value="com.correaj418.lyricsapp.ui.SearchActivity"/>
         </activity>
     </application>
 
