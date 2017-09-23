@@ -7,8 +7,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.correaj418.lyricsapi.SongModel;
-import com.correaj418.lyricsapi.utilities.Log;
+import com.correaj418.lyricsapi.models.Song;
 
 import java.util.List;
 
@@ -19,16 +18,16 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 {
     private static final String TAG = RecyclerViewAdapter.class.getSimpleName();
 
-    private List<SongModel> obSongModels;
+    private List<Song> obSongModels;
 
     private OnItemClickListener obItemClickListener;
 
-    public RecyclerViewAdapter(List<SongModel> modelList)
+    public RecyclerViewAdapter(List<Song> modelList)
     {
         this.obSongModels = modelList;
     }
 
-    public void updateList(List<SongModel> arSongModels)
+    public void updateList(List<Song> arSongModels)
     {
         this.obSongModels = arSongModels;
         notifyDataSetChanged();
@@ -49,9 +48,9 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     {
         if (arViewHolder instanceof ViewHolder)
         {
-            final SongModel loSongModel = getItem(arPosition);
+            final Song loSongModel = getItem(arPosition);
 
-            Log.v(TAG, "Binding view for song " + loSongModel.toString());
+//            Log.v(TAG, "Binding view for song " + loSongModel.toString());
 
             ViewHolder loGenericViewHolder = (ViewHolder) arViewHolder;
 
@@ -73,7 +72,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         this.obItemClickListener = mItemClickListener;
     }
 
-    private SongModel getItem(int position)
+    private Song getItem(int position)
     {
         return obSongModels.get(position);
     }
@@ -82,7 +81,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     {
         void onItemClick(View arView,
                          int arPosition,
-                         SongModel arModel);
+                         Song arModel);
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder

@@ -31,4 +31,9 @@ dependencies {
 
     compile 'com.google.code.gson:gson:2.8.1'
     compile 'com.squareup.okhttp3:okhttp:3.9.0'
+
+    compile group: 'org.jsoup', name: 'jsoup', version: '1.10.3'
+
+    compile 'org.parceler:parceler-api:1.1.9'
+    annotationProcessor 'org.parceler:parceler:1.1.9'
 }

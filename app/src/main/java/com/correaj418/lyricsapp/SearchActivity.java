@@ -1,6 +1,7 @@
 package com.correaj418.lyricsapp;
 
 import android.app.SearchManager;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.view.MenuItemCompat;
@@ -18,8 +19,9 @@ import android.widget.EditText;
 import com.correaj418.lyricsapi.Constants.HTTP_STATUS;
 import com.correaj418.lyricsapi.LyricsApiService;
 import com.correaj418.lyricsapi.LyricsApiService.SongSearchCallback;
-import com.correaj418.lyricsapi.SongModel;
-import com.correaj418.lyricsapi.SongsListModel;
+import com.correaj418.lyricsapi.models.Lyrics;
+import com.correaj418.lyricsapi.models.Song;
+import com.correaj418.lyricsapi.models.Song.SongsListWrapper;
 import com.correaj418.lyricsapi.utilities.Log;
 
 import java.util.ArrayList;
@@ -27,7 +29,7 @@ import java.util.ArrayList;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class SearchActivity extends AppCompatActivity implements SearchView.OnQueryTextListener
+public class SearchActivity extends AppCompatActivity implements SearchView.OnQueryTextListener, RecyclerViewAdapter.OnItemClickListener
 {
     private static final String TAG = SearchActivity.class.getSimpleName();
 
@@ -39,7 +41,7 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
 
     private RecyclerViewAdapter mAdapter;
 
-    private ArrayList<SongModel> modelList = new ArrayList<>();
+    private ArrayList<Song> modelList = new ArrayList<>();
 
     //region lifecycle
 
@@ -133,16 +135,7 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
 
         recyclerView.setAdapter(mAdapter);
 
-        mAdapter.SetOnItemClickListener(new RecyclerViewAdapter.OnItemClickListener()
-        {
-            @Override
-            public void onItemClick(View view, int position, SongModel model)
-            {
-                //handle item click events here
-                // TODO - handle click
-//                Toast.makeText(SearchActivity.this, "Hey " + model.getTitle(), Toast.LENGTH_SHORT).show();
-            }
-        });
+        mAdapter.SetOnItemClickListener(this);
     }
 
     //region SearchView.OnQueryTextListener
@@ -150,11 +143,11 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
     @Override
     public boolean onQueryTextSubmit(String arQuery)
     {
-        LyricsApiService.instance().searchForTracks(arQuery, new SongSearchCallback()
+        LyricsApiService.instance().searchForTracks(arQuery, new SongSearchCallback<SongsListWrapper>()
         {
             @Override
             public void onSongSearchCallback(HTTP_STATUS arHttpStatus,
-                                             SongsListModel arSongsListModel)
+                                             SongsListWrapper arSongsListModel)
             {
                 Log.d(TAG, "onSongSearchCallback returned status code " + arHttpStatus);
 
@@ -179,11 +172,14 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
 
     //region request handling
 
-    private void handleSongSearchResult(SongsListModel arSongsListModel)
+    private void handleSongSearchResult(SongsListWrapper arSongsListModel)
     {
         Log.v(TAG, "handleSongSearchResult() called with " + arSongsListModel.getResultCount() + " results");
 
         mAdapter.updateList(arSongsListModel.getSongResultsList());
+
+        // TODO - temp
+        onItemClick(null, 0, arSongsListModel.getSongResultsList().get(0));
     }
 
     private void handleSongSearchFailure(HTTP_STATUS arHttpStatus)
@@ -191,6 +187,36 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
         Log.e(TAG, "handleSongSearchFailure() called with status " + arHttpStatus);
 
         // TODO
+    }
+
+    //endregion
+
+    //region RecyclerViewAdapter.OnItemClickListener
+
+    @Override
+    public void onItemClick(View arView, int arPosition, Song arModel)
+    {
+        //handle item click events here
+        // TODO - handle click
+        Log.v(TAG, "onItemClick for song " + arModel.toString());
+//                Toast.makeText(SearchActivity.this, "Hey " + model.getTitle(), Toast.LENGTH_SHORT).show();
+
+        LyricsApiService.instance().searchForLyrics(arModel, new SongSearchCallback<Lyrics>()
+        {
+            @Override
+            public void onSongSearchCallback(HTTP_STATUS arHttpStatus,
+                                             Lyrics arLyricsModel)
+            {
+                Bundle loLyricsBundle = new Bundle();
+                // TODO - const
+                loLyricsBundle.putParcelable("lyrics", arLyricsModel);
+
+                Intent loLyricsActivityIntent = new Intent(SearchActivity.this, LyricsActivity.class)
+                        .putExtra("lyrics", loLyricsBundle);
+
+                startActivity(loLyricsActivityIntent);
+            }
+        });
     }
 
     //endregion

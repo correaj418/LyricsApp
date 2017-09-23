@@ -1,10 +1,15 @@
-package com.correaj418.lyricsapi;
+package com.correaj418.lyricsapi.models;
 
+import com.correaj418.lyricsapi.Constants;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class SongModel
+import java.util.List;
+
+public class Song
 {
+    //region properties
+
     // "trackName": "I Hope That I Don't Fall In Love With You",
     @Expose
     @SerializedName("trackName")
@@ -31,11 +36,15 @@ public class SongModel
     @SerializedName("collectionName")
     private final String obAlbumName;
 
-    public SongModel(String arSongName,
-                     String arArtistName,
-                     String arAlbumArtUrl,
-                     String arReleaseDate,
-                     String arAlbumName)
+    //endregion
+
+    //region constructor
+
+    public Song(String arSongName,
+                String arArtistName,
+                String arAlbumArtUrl,
+                String arReleaseDate,
+                String arAlbumName)
     {
         obSongName = arSongName;
         obArtistName = arArtistName;
@@ -43,6 +52,10 @@ public class SongModel
         obReleaseDate = arReleaseDate;
         obAlbumName = arAlbumName;
     }
+
+    //endregion
+
+    //region getters
 
     public String getSongName()
     {
@@ -69,6 +82,16 @@ public class SongModel
         return obAlbumName;
     }
 
+    //endregion
+
+    //region helpers
+
+    public String toLyricsUrl()
+    {
+        // TODO - sanitize url
+        return String.format(Constants.LYRICS_API_URL, obArtistName, obSongName);
+    }
+
     @Override
     public String toString()
     {
@@ -78,4 +101,31 @@ public class SongModel
                 "\nRelease Date: " + obReleaseDate +
                 "\nAlbum Cover URL: " + obAlbumArtUrl;
     }
+
+    //endregion
+
+    //region json list wrapper
+
+    public static class SongsListWrapper
+    {
+        @Expose
+        @SerializedName("resultCount")
+        private int obResultCount;
+
+        @Expose
+        @SerializedName("results")
+        private List<Song> obSongResultsList;
+
+        public int getResultCount()
+        {
+            return obResultCount;
+        }
+
+        public List<Song> getSongResultsList()
+        {
+            return obSongResultsList;
+        }
+    }
+
+    //endregion
 }
