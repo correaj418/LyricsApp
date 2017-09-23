@@ -29,29 +29,17 @@ import static com.correaj418.lyricsapp.api.constants.Constants.REQUEST_TYPE.APPL
 import static com.correaj418.lyricsapp.api.constants.Constants.REQUEST_TYPE.COMPLETE_LYRICS_REQUEST;
 import static com.correaj418.lyricsapp.api.constants.Constants.REQUEST_TYPE.LYRICS_METADATA_REQUEST;
 
-public class LyricsApiService
+public class LyricsApi
 {
-    private static final String TAG = LyricsApiService.class.getSimpleName();
-
-    private static LyricsApiService sInstance;
+    private static final String TAG = LyricsApi.class.getSimpleName();
 
     private final OkHttpClient obOkHttpClient;
     private final Gson obGson;
 
-    private LyricsApiService()
+    public LyricsApi()
     {
         obOkHttpClient = new OkHttpClient();
         obGson = new Gson();
-    }
-
-    public static LyricsApiService instance()
-    {
-        if (sInstance == null)
-        {
-            sInstance = new LyricsApiService();
-        }
-
-        return sInstance;
     }
 
     public void getSongsForSearchTerm(String arSearchTerm,

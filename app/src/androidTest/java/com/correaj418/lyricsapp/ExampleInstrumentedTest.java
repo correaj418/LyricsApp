@@ -4,8 +4,8 @@ import android.content.Context;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
 
-import com.correaj418.lyricsapp.api.LyricsApiService;
-import com.correaj418.lyricsapp.api.LyricsApiService.ApiCallback;
+import com.correaj418.lyricsapp.api.LyricsApi;
+import com.correaj418.lyricsapp.api.LyricsApi.ApiCallback;
 import com.correaj418.lyricsapp.api.constants.Constants.HTTP_STATUS;
 import com.correaj418.lyricsapp.api.models.Song.SongsListWrapper;
 
@@ -38,7 +38,7 @@ public class ExampleInstrumentedTest
 
     public void request()
     {
-        LyricsApiService.instance()
+        LyricsApi.instance()
                 .getSongsForSearchTerm("tom waits", new ApiCallback<SongsListWrapper>()
                 {
                     @Override

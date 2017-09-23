@@ -19,7 +19,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
 import com.correaj418.lyricsapp.R;
-import com.correaj418.lyricsapp.api.LyricsApiService;
+import com.correaj418.lyricsapp.api.LyricsApi;
 import com.correaj418.lyricsapp.api.constants.Constants.HTTP_STATUS;
 import com.correaj418.lyricsapp.api.models.ApiCallback;
 import com.correaj418.lyricsapp.api.models.Lyric;
@@ -49,6 +49,8 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
     private RecyclerViewAdapter obRecyclerViewAdapter;
 
     private ProgressDialog obLoadingDialog;
+
+    private LyricsApi obLyricsApi = new LyricsApi();
 
     //region lifecycle
 
@@ -115,7 +117,7 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
     {
         dismissKeyboard();
 
-        LyricsApiService.instance().getSongsForSearchTerm(arQuery, new ApiCallback<SongsListWrapper>()
+        obLyricsApi.getSongsForSearchTerm(arQuery, new ApiCallback<SongsListWrapper>()
         {
             @Override
             public void onSongSearchCallback(final HTTP_STATUS arHttpStatus,
@@ -185,7 +187,7 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
     {
         Log.v(TAG, "onItemClick for song " + arSongModel.toString());
 
-        LyricsApiService.instance().getLyricsForSong(arSongModel, new ApiCallback<Lyric>()
+        obLyricsApi.getLyricsForSong(arSongModel, new ApiCallback<Lyric>()
         {
             @Override
             public void onSongSearchCallback(HTTP_STATUS arHttpStatus,

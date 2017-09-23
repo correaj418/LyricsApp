@@ -89,7 +89,9 @@ public class Lyric
 
     public Spanned getCompleteLyricsAsHtml()
     {
-        return Html.fromHtml(obCompleteLyrics);
+        String loCompleteLyrics = obCompleteLyrics != null ? obCompleteLyrics : "";
+
+        return Html.fromHtml(loCompleteLyrics);
     }
 
     //region setters
