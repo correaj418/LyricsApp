@@ -1,6 +1,6 @@
 package com.correaj418.lyricsapp;
 
-import android.app.SearchManager;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -10,10 +10,9 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
-import android.text.InputFilter;
-import android.text.Spanned;
 import android.view.Menu;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
 import com.correaj418.lyricsapi.Constants.HTTP_STATUS;
@@ -23,6 +22,8 @@ import com.correaj418.lyricsapi.models.Lyrics;
 import com.correaj418.lyricsapi.models.Song;
 import com.correaj418.lyricsapi.models.Song.SongsListWrapper;
 import com.correaj418.lyricsapi.utilities.Log;
+
+import org.parceler.Parcels;
 
 import java.util.ArrayList;
 
@@ -48,19 +49,17 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
+        Log.v(TAG, "onCreate() called");
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
 
         ButterKnife.bind(this);
+
         initToolbar("Lyrics");
         setAdapter();
-    }
 
-    @Override
-    protected void onResume()
-    {
-        super.onResume();
-
+        // TODO
         onQueryTextSubmit("brand new");
     }
 
@@ -85,38 +84,12 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
         final SearchView searchView = (SearchView) MenuItemCompat
                 .getActionView(menu.findItem(R.id.action_search));
 
-        SearchManager searchManager = (SearchManager) this.getSystemService(this.SEARCH_SERVICE);
-        searchView.setSearchableInfo(searchManager.getSearchableInfo(this.getComponentName()));
-
         //changing edittext color
         EditText searchEdit = ((EditText) searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text));
         searchEdit.setTextColor(Color.WHITE);
         searchEdit.setHintTextColor(Color.WHITE);
         searchEdit.setBackgroundColor(Color.TRANSPARENT);
         searchEdit.setHint("Search");
-
-        InputFilter[] fArray = new InputFilter[2];
-        fArray[0] = new InputFilter.LengthFilter(40);
-        fArray[1] = new InputFilter()
-        {
-            @Override
-            public CharSequence filter(CharSequence source, int start, int end, Spanned dest, int dstart, int dend)
-            {
-                for (int i = start; i < end; i++)
-                {
-                    if (!Character.isLetterOrDigit(source.charAt(i)))
-                    {
-                        return "";
-                    }
-                }
-
-                return null;
-            }
-        };
-
-        searchEdit.setFilters(fArray);
-        View v = searchView.findViewById(android.support.v7.appcompat.R.id.search_plate);
-        v.setBackgroundColor(Color.TRANSPARENT);
 
         searchView.setOnQueryTextListener(this);
 
@@ -178,8 +151,8 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
 
         mAdapter.updateList(arSongsListModel.getSongResultsList());
 
-        // TODO - temp
-        onItemClick(null, 0, arSongsListModel.getSongResultsList().get(0));
+        dismissKeyboard();
+//        onItemClick(null, 0, arSongsListModel.getSongResultsList().get(0));
     }
 
     private void handleSongSearchFailure(HTTP_STATUS arHttpStatus)
@@ -207,12 +180,8 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
             public void onSongSearchCallback(HTTP_STATUS arHttpStatus,
                                              Lyrics arLyricsModel)
             {
-                Bundle loLyricsBundle = new Bundle();
-                // TODO - const
-                loLyricsBundle.putParcelable("lyrics", arLyricsModel);
-
                 Intent loLyricsActivityIntent = new Intent(SearchActivity.this, LyricsActivity.class)
-                        .putExtra("lyrics", loLyricsBundle);
+                        .putExtra("lyrics", Parcels.wrap(arLyricsModel));
 
                 startActivity(loLyricsActivityIntent);
             }
@@ -220,4 +189,16 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
     }
 
     //endregion
+
+    private void dismissKeyboard()
+    {
+        InputMethodManager inputManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+
+        getWindow().getCurrentFocus().clearFocus();
+
+        inputManager.hideSoftInputFromWindow(
+                getWindow().getCurrentFocus().getWindowToken(),
+                InputMethodManager.HIDE_NOT_ALWAYS);
+
+    }
 }

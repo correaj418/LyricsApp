@@ -185,14 +185,21 @@ public class LyricsApiService
         Document doc = Jsoup.parse(loResponseHtml);
         Elements loElements = doc.getElementsByClass("lyricbox");
 
-        if (loElements.size() > 1)
+        if (loElements.isEmpty())
+        {
+            // todo
+            Log.e(TAG, "Couldn't find lyrics");
+        }
+        else if (loElements.size() > 1)
         {
             // todo
             Log.e(TAG, "html changed todo");
         }
-
-        String loLyricsHtmlContent = loElements.get(0).getAllElements().text();
-        loLyricsModel.setCompleteLyrics(loLyricsHtmlContent);
+        else
+        {
+            String loLyricsHtmlContent = loElements.get(0).getAllElements().text();
+            loLyricsModel.setCompleteLyrics(loLyricsHtmlContent);
+        }
 
         obMainThreadHandler.post(new Runnable()
         {
@@ -233,6 +240,8 @@ public class LyricsApiService
                              REQUEST_TYPE arRequestType,
                              Callback arCallback)
     {
+        Log.v(TAG, "sendRequest() called with url " + arUrl);
+
         Request loRequest = new Request.Builder()
                 .url(arUrl)
                 .tag(arRequestType)

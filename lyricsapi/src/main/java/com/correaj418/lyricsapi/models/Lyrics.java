@@ -1,14 +1,15 @@
 package com.correaj418.lyricsapi.models;
 
-import android.os.Parcel;
-import android.os.Parcelable;
-
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import org.parceler.Parcel;
+import org.parceler.ParcelConstructor;
+
 import java.util.List;
 
-public class Lyrics implements Parcelable
+@Parcel
+public class Lyrics
 {
     //region properties
 
@@ -45,39 +46,27 @@ public class Lyrics implements Parcelable
                   String arPartialLyrics,
                   String arCompleteLyricsUrl)
     {
-        obSongName = arSongName;
-        obArtistName = arArtistName;
-        obPartialLyrics = arPartialLyrics;
-        obCompleteLyricsUrl = arCompleteLyricsUrl;
+        this(arSongName, arArtistName, arPartialLyrics, arCompleteLyricsUrl, null);
     }
 
-    protected Lyrics(Parcel arParcelIn)
+    @SuppressWarnings("WeakerAccess")
+    @ParcelConstructor
+    public Lyrics(String obSongName,
+                  String obArtistName,
+                  String obPartialLyrics,
+                  String obCompleteLyricsUrl,
+                  String obCompleteLyrics)
     {
-        obSongName = arParcelIn.readString();
-        obArtistName = arParcelIn.readString();
-        obPartialLyrics = arParcelIn.readString();
-        obCompleteLyricsUrl = arParcelIn.readString();
-        obCompleteLyrics = arParcelIn.readString();
+        this.obSongName = obSongName;
+        this.obArtistName = obArtistName;
+        this.obPartialLyrics = obPartialLyrics;
+        this.obCompleteLyricsUrl = obCompleteLyricsUrl;
+        this.obCompleteLyrics = obCompleteLyrics;
     }
 
     //endregion
 
     //region getters
-
-    public static final Creator<Lyrics> CREATOR = new Creator<Lyrics>()
-    {
-        @Override
-        public Lyrics createFromParcel(Parcel in)
-        {
-            return new Lyrics(in);
-        }
-
-        @Override
-        public Lyrics[] newArray(int size)
-        {
-            return new Lyrics[size];
-        }
-    };
 
     public String getSongName()
     {
@@ -109,26 +98,6 @@ public class Lyrics implements Parcelable
     public void setCompleteLyrics(String arCompleteLyrics)
     {
         obCompleteLyrics = arCompleteLyrics;
-    }
-
-    //endregion
-
-    //region Parcelable
-
-    @Override
-    public int describeContents()
-    {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags)
-    {
-        dest.writeString(obSongName);
-        dest.writeString(obArtistName);
-        dest.writeString(obPartialLyrics);
-        dest.writeString(obCompleteLyricsUrl);
-        dest.writeString(obCompleteLyrics);
     }
 
     //endregion
