@@ -1,5 +1,8 @@
 package com.correaj418.lyricsapi.models;
 
+import android.text.Html;
+import android.text.Spanned;
+
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
@@ -88,9 +91,14 @@ public class Lyrics
         return obCompleteLyricsUrl;
     }
 
-    public String getCompleteLyrics()
+    public String getCompleteLyricsAsText()
     {
         return obCompleteLyrics;
+    }
+
+    public Spanned getCompleteLyricsAsHtml()
+    {
+        return Html.fromHtml(obCompleteLyrics);
     }
 
     //region setters

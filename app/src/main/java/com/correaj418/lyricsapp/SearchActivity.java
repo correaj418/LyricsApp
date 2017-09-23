@@ -25,8 +25,6 @@ import com.correaj418.lyricsapi.utilities.Log;
 
 import org.parceler.Parcels;
 
-import java.util.ArrayList;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -35,14 +33,12 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
     private static final String TAG = SearchActivity.class.getSimpleName();
 
     @BindView(R.id.recycler_view)
-    RecyclerView recyclerView;
+    RecyclerView obRecyclerView;
 
     @BindView(R.id.toolbar)
-    Toolbar toolbar;
+    Toolbar obToolbar;
 
-    private RecyclerViewAdapter mAdapter;
-
-    private ArrayList<Song> modelList = new ArrayList<>();
+    private RecyclerViewAdapter obRecyclerViewAdapter;
 
     //region lifecycle
 
@@ -67,7 +63,7 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
 
     public void initToolbar(String title)
     {
-        setSupportActionBar(toolbar);
+        setSupportActionBar(obToolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setTitle(title);
@@ -98,17 +94,17 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
 
     private void setAdapter()
     {
-        mAdapter = new RecyclerViewAdapter(modelList);
+        obRecyclerViewAdapter = new RecyclerViewAdapter(SearchActivity.this);
 
-        recyclerView.setHasFixedSize(true);
+        obRecyclerView.setHasFixedSize(true);
 
         // use a linear layout manager
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
-        recyclerView.setLayoutManager(layoutManager);
+        obRecyclerView.setLayoutManager(layoutManager);
 
-        recyclerView.setAdapter(mAdapter);
+        obRecyclerView.setAdapter(obRecyclerViewAdapter);
 
-        mAdapter.SetOnItemClickListener(this);
+        obRecyclerViewAdapter.SetOnItemClickListener(this);
     }
 
     //region SearchView.OnQueryTextListener
@@ -116,6 +112,8 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
     @Override
     public boolean onQueryTextSubmit(String arQuery)
     {
+        dismissKeyboard();
+
         LyricsApiService.instance().searchForTracks(arQuery, new SongSearchCallback<SongsListWrapper>()
         {
             @Override
@@ -149,10 +147,9 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
     {
         Log.v(TAG, "handleSongSearchResult() called with " + arSongsListModel.getResultCount() + " results");
 
-        mAdapter.updateList(arSongsListModel.getSongResultsList());
+        obRecyclerView.scrollToPosition(0);
 
-        dismissKeyboard();
-//        onItemClick(null, 0, arSongsListModel.getSongResultsList().get(0));
+        obRecyclerViewAdapter.updateList(arSongsListModel.getSongResultsList());
     }
 
     private void handleSongSearchFailure(HTTP_STATUS arHttpStatus)
@@ -172,7 +169,6 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
         //handle item click events here
         // TODO - handle click
         Log.v(TAG, "onItemClick for song " + arModel.toString());
-//                Toast.makeText(SearchActivity.this, "Hey " + model.getTitle(), Toast.LENGTH_SHORT).show();
 
         LyricsApiService.instance().searchForLyrics(arModel, new SongSearchCallback<Lyrics>()
         {
@@ -192,13 +188,9 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
 
     private void dismissKeyboard()
     {
-        InputMethodManager inputManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        obRecyclerView.requestFocus();
 
-        getWindow().getCurrentFocus().clearFocus();
-
-        inputManager.hideSoftInputFromWindow(
-                getWindow().getCurrentFocus().getWindowToken(),
-                InputMethodManager.HIDE_NOT_ALWAYS);
-
+        InputMethodManager loInputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        loInputMethodManager.hideSoftInputFromWindow(obRecyclerView.getWindowToken(), 0);
     }
 }

@@ -1,5 +1,6 @@
 package com.correaj418.lyricsapp;
 
+import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,7 +9,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.correaj418.lyricsapi.models.Song;
+import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -22,9 +25,12 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
     private OnItemClickListener obItemClickListener;
 
-    public RecyclerViewAdapter(List<Song> modelList)
+    private Context obActivityContext;
+
+    public RecyclerViewAdapter(Context arActivityContext)
     {
-        this.obSongModels = modelList;
+        obActivityContext = arActivityContext;
+        obSongModels = new ArrayList<>();
     }
 
     public void updateList(List<Song> arSongModels)
@@ -54,7 +60,10 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
             ViewHolder loGenericViewHolder = (ViewHolder) arViewHolder;
 
-//            loGenericViewHolder.obAlbumCoverImageView = TODO
+            Picasso.with(obActivityContext)
+                    .load(loSongModel.getAlbumArtUrl())
+                    .into(loGenericViewHolder.obAlbumCoverImageView);
+
             loGenericViewHolder.obSongNameTextView.setText(loSongModel.getSongName());
             loGenericViewHolder.obArtistNameTextView.setText(loSongModel.getArtistName());
             loGenericViewHolder.obAlbumNameTextView.setText(loSongModel.getAlbumName());

@@ -39,7 +39,7 @@ public class LyricsActivity extends AppCompatActivity
 
         obLyricsModel = Parcels.unwrap(getIntent().getExtras().getParcelable("lyrics"));
 
-        obLyricsTextView.setText(obLyricsModel.getCompleteLyrics());
+        obLyricsTextView.setText(obLyricsModel.getCompleteLyricsAsHtml());
     }
 
     public void initToolbar(String title)

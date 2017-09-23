@@ -171,6 +171,13 @@ public class LyricsApiService
             public void onResponse(Call call, Response response) throws IOException
             {
                 Log.i(TAG, "");
+
+                if (loLyricsModel.getPartialLyrics().equals("Not found"))
+                {
+                    // TODO -
+                    Log.e(TAG, "No lyrics available");
+                }
+
                 handleFullLyricsResponse(response, loLyricsModel, arCallback);
             }
         });
@@ -185,6 +192,8 @@ public class LyricsApiService
         Document doc = Jsoup.parse(loResponseHtml);
         Elements loElements = doc.getElementsByClass("lyricbox");
 
+        String loLyricsHtmlContent = "";
+
         if (loElements.isEmpty())
         {
             // todo
@@ -197,9 +206,10 @@ public class LyricsApiService
         }
         else
         {
-            String loLyricsHtmlContent = loElements.get(0).getAllElements().text();
-            loLyricsModel.setCompleteLyrics(loLyricsHtmlContent);
+            loLyricsHtmlContent = loElements.get(0).getAllElements().html();
         }
+
+        loLyricsModel.setCompleteLyrics(loLyricsHtmlContent);
 
         obMainThreadHandler.post(new Runnable()
         {
