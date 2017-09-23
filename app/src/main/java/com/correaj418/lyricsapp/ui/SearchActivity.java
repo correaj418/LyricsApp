@@ -20,8 +20,8 @@ import android.widget.EditText;
 
 import com.correaj418.lyricsapp.R;
 import com.correaj418.lyricsapp.api.LyricsApiService;
-import com.correaj418.lyricsapp.api.LyricsApiService.SongSearchCallback;
 import com.correaj418.lyricsapp.api.constants.Constants.HTTP_STATUS;
+import com.correaj418.lyricsapp.api.models.ApiCallback;
 import com.correaj418.lyricsapp.api.models.Lyric;
 import com.correaj418.lyricsapp.api.models.Song;
 import com.correaj418.lyricsapp.api.models.Song.SongsListWrapper;
@@ -38,6 +38,7 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
     private static final String TAG = SearchActivity.class.getSimpleName();
 
     public static final String LYRICS_PARCEL_KEY = "LYRICS_PARCEL_KEY";
+    public static final String SONG_PARCEL_KEY = "SONG_PARCEL_KEY";
 
     @BindView(R.id.recycler_view)
     RecyclerView obRecyclerView;
@@ -65,8 +66,7 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
         getSupportActionBar().setTitle(R.string.app_name);
         setAdapter();
 
-        // TODO
-        onQueryTextSubmit("brand new");
+//        onQueryTextSubmit("brand new");
     }
 
     //endregion
@@ -115,7 +115,7 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
     {
         dismissKeyboard();
 
-        LyricsApiService.instance().searchForTracks(arQuery, new SongSearchCallback<SongsListWrapper>()
+        LyricsApiService.instance().getSongsForSearchTerm(arQuery, new ApiCallback<SongsListWrapper>()
         {
             @Override
             public void onSongSearchCallback(final HTTP_STATUS arHttpStatus,
@@ -181,11 +181,11 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
     //region RecyclerViewAdapter.OnItemClickListener
 
     @Override
-    public void onItemClick(View arView, int arPosition, Song arModel)
+    public void onItemClick(View arView, int arPosition, final Song arSongModel)
     {
-        Log.v(TAG, "onItemClick for song " + arModel.toString());
+        Log.v(TAG, "onItemClick for song " + arSongModel.toString());
 
-        LyricsApiService.instance().searchForLyrics(arModel, new SongSearchCallback<Lyric>()
+        LyricsApiService.instance().getLyricsForSong(arSongModel, new ApiCallback<Lyric>()
         {
             @Override
             public void onSongSearchCallback(HTTP_STATUS arHttpStatus,
@@ -206,7 +206,8 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
                         }
 
                         Intent loLyricsActivityIntent = new Intent(SearchActivity.this, LyricsActivity.class)
-                                .putExtra(LYRICS_PARCEL_KEY, Parcels.wrap(arLyricModel));
+                                .putExtra(LYRICS_PARCEL_KEY, Parcels.wrap(arLyricModel))
+                                .putExtra(SONG_PARCEL_KEY, Parcels.wrap(arSongModel));
 
                         startActivity(loLyricsActivityIntent);
                     }
@@ -214,8 +215,7 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
             }
         });
 
-        showLoadingDialog(getString(R.string.downloading_lyrics),
-                getString(R.string.please_wait));
+        showLoadingDialog(getString(R.string.downloading_lyrics), getString(R.string.please_wait));
     }
 
     //endregion

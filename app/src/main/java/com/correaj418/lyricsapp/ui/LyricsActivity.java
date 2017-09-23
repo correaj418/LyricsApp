@@ -9,6 +9,7 @@ import android.widget.TextView;
 
 import com.correaj418.lyricsapp.R;
 import com.correaj418.lyricsapp.api.models.Lyric;
+import com.correaj418.lyricsapp.api.models.Song;
 import com.squareup.picasso.Picasso;
 
 import org.parceler.Parcels;
@@ -17,6 +18,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 import static com.correaj418.lyricsapp.ui.SearchActivity.LYRICS_PARCEL_KEY;
+import static com.correaj418.lyricsapp.ui.SearchActivity.SONG_PARCEL_KEY;
 
 public class LyricsActivity extends AppCompatActivity
 {
@@ -47,18 +49,24 @@ public class LyricsActivity extends AppCompatActivity
 
         ButterKnife.bind(this);
 
+        initUi();
+    }
+
+    private void initUi()
+    {
         Lyric loLyricModel = Parcels.unwrap(getIntent().getExtras().getParcelable(LYRICS_PARCEL_KEY));
+        Song loSongModel = Parcels.unwrap(getIntent().getExtras().getParcelable(SONG_PARCEL_KEY));
 
         setSupportActionBar(obToolbar);
         getSupportActionBar().setTitle(getString(R.string.lyrics_title) + loLyricModel.getSongName());
 
         Picasso.with(this)
-                .load(loLyricModel.getSongModel().getAlbumArtUrl())
+                .load(loSongModel.getAlbumArtUrl())
                 .into(obAlbumCoverImageView);
 
         obSongNameTextView.setText(loLyricModel.getSongName());
         obArtistNameTextView.setText(loLyricModel.getArtistName());
-        obAlbumNameTextView.setText(loLyricModel.getSongModel().getAlbumName());
+        obAlbumNameTextView.setText(loSongModel.getAlbumName());
 
         obLyricsTextView.setText(loLyricModel.getCompleteLyricsAsHtml());
     }

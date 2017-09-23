@@ -5,6 +5,8 @@ import android.util.Log;
 
 import com.correaj418.lyricsapp.api.constants.Constants;
 import com.correaj418.lyricsapp.api.constants.Constants.HTTP_STATUS;
+import com.correaj418.lyricsapp.api.constants.Constants.REQUEST_TYPE;
+import com.correaj418.lyricsapp.api.models.ApiCallback;
 import com.correaj418.lyricsapp.api.models.Lyric;
 import com.correaj418.lyricsapp.api.models.Song;
 import com.correaj418.lyricsapp.api.models.Song.SongsListWrapper;
@@ -22,11 +24,10 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
-import static com.correaj418.lyricsapp.api.LyricsApiService.REQUEST_TYPE.APPLE_API_REQUEST;
-import static com.correaj418.lyricsapp.api.LyricsApiService.REQUEST_TYPE.COMPLETE_LYRICS_REQUEST;
-import static com.correaj418.lyricsapp.api.LyricsApiService.REQUEST_TYPE.LYRICS_REQUEST;
 import static com.correaj418.lyricsapp.api.constants.Constants.LYRICS_HTML_CLASS_NAME;
-import static com.correaj418.lyricsapp.api.constants.Constants.LYRICS_NOT_FOUND_RESPONSE;
+import static com.correaj418.lyricsapp.api.constants.Constants.REQUEST_TYPE.APPLE_API_REQUEST;
+import static com.correaj418.lyricsapp.api.constants.Constants.REQUEST_TYPE.COMPLETE_LYRICS_REQUEST;
+import static com.correaj418.lyricsapp.api.constants.Constants.REQUEST_TYPE.LYRICS_METADATA_REQUEST;
 
 public class LyricsApiService
 {
@@ -53,146 +54,52 @@ public class LyricsApiService
         return sInstance;
     }
 
-    public void searchForTracks(String arSearchTerm,
-                                final SongSearchCallback<SongsListWrapper> arCallback)
+    public void getSongsForSearchTerm(String arSearchTerm,
+                                      final ApiCallback<SongsListWrapper> arCallback)
     {
         String loUrl = String.format(Constants.APPLE_API_URL, arSearchTerm);
-        sendRequest(loUrl, APPLE_API_REQUEST, new Callback()
+        sendRequest(loUrl, APPLE_API_REQUEST, arCallback);
+    }
+
+    public void getLyricsForSong(final Song arSongModel,
+                                 final ApiCallback<Lyric> arCallback)
+    {
+        sendRequest(arSongModel.toLyricsUrl(), LYRICS_METADATA_REQUEST, new ApiCallback<Lyric>()
         {
             @Override
-            public void onFailure(@NonNull Call arCall,
-                                  @NonNull IOException arException)
+            public void onSongSearchCallback(HTTP_STATUS arHttpStatus,
+                                             final Lyric arSongsListModel)
             {
-                Log.e(TAG, arException.getMessage());
-
-                arCallback.onSongSearchCallback(HTTP_STATUS.NETWORK_ERROR, null);
-            }
-
-            @Override
-            public void onResponse(@NonNull Call arCall,
-                                   @NonNull Response arResponse) throws IOException
-            {
-                SongsListWrapper loSongsModel = null;
-                HTTP_STATUS loStatusCOde = HTTP_STATUS.getHttpStatusForCode(arResponse.code());
-
-                if (loStatusCOde == HTTP_STATUS.OK)
+                if (arHttpStatus != HTTP_STATUS.OK)
                 {
-                    final String loResponseJson = arResponse.body().string();
-                    loSongsModel = obGson.fromJson(loResponseJson, SongsListWrapper.class);
-                }
-                else
-                {
-                    Log.e(TAG, "Request failed with status code " + arResponse.code());
+                    arCallback.onSongSearchCallback(arHttpStatus, null);
+                    return;
                 }
 
-                arCallback.onSongSearchCallback(HTTP_STATUS.OK, loSongsModel);
+                sendRequest(arSongsListModel.getCompleteLyricsUrl(), COMPLETE_LYRICS_REQUEST, new ApiCallback<String>()
+                {
+                    @Override
+                    public void onSongSearchCallback(HTTP_STATUS arHttpStatus,
+                                                     String arLyricsHtml)
+                    {
+                        if (arHttpStatus != HTTP_STATUS.OK)
+                        {
+                            arCallback.onSongSearchCallback(arHttpStatus, arSongsListModel);
+                            return;
+                        }
+
+                        arSongsListModel.setCompleteLyrics(arLyricsHtml);
+
+                        arCallback.onSongSearchCallback(arHttpStatus, arSongsListModel);
+                    }
+                });
             }
         });
     }
 
-    public void searchForLyrics(final Song arSongModel,
-                                final SongSearchCallback<Lyric> arCallback)
-    {
-        sendRequest(arSongModel.toLyricsUrl(), LYRICS_REQUEST, new Callback()
-        {
-            @Override
-            public void onFailure(@NonNull Call arCall,
-                                  @NonNull IOException arException)
-            {
-                Log.e(TAG, arException.getMessage());
-
-                arCallback.onSongSearchCallback(HTTP_STATUS.NETWORK_ERROR, null);
-            }
-
-            @Override
-            public void onResponse(@NonNull Call arCall,
-                                   @NonNull Response arResponse) throws IOException
-            {
-                REQUEST_TYPE loRequestType = (REQUEST_TYPE) arResponse.request().tag();
-
-                switch (loRequestType)
-                {
-                    case LYRICS_REQUEST:
-                        handleLyricsResponse(arResponse, arSongModel, arCallback);
-                        break;
-                    case COMPLETE_LYRICS_REQUEST:
-                        break;
-                    default:
-                        // TODO
-                        Log.e(TAG, "Unknown request type with url " + arResponse.request().url());
-                        break;
-                }
-            }
-        });
-    }
-
-    private void handleLyricsResponse(Response arResponse,
-                                      Song arSongModel,
-                                      final SongSearchCallback<Lyric> arCallback) throws IOException
-    {
-        // for whatever reason the json response contains
-        // "song = " in front of it, so we need to remove it
-        String loResponseJson = arResponse.body().string().replace("song = ", "");
-
-        final Lyric loLyricModel = obGson.fromJson(loResponseJson, Lyric.class);
-        loLyricModel.setSongModel(arSongModel);
-
-        sendRequest(loLyricModel.getCompleteLyricsUrl(), COMPLETE_LYRICS_REQUEST, new Callback()
-        {
-            @Override
-            public void onFailure(@NonNull Call arCall,
-                                  @NonNull IOException arException)
-            {
-                Log.e(TAG, arException.getMessage());
-
-                arCallback.onSongSearchCallback(HTTP_STATUS.NETWORK_ERROR, null);
-            }
-
-            @Override
-            public void onResponse(@NonNull Call arCall,
-                                   @NonNull Response arResponse) throws IOException
-            {
-                // when the lyrics aren't available for a song
-                // the "lyrics" parameter returns "Not found"
-                if (loLyricModel.getPartialLyrics().equals(LYRICS_NOT_FOUND_RESPONSE))
-                {
-                    Log.e(TAG, "No lyrics available for song");
-                }
-
-                handleFullLyricsResponse(arResponse, loLyricModel, arCallback);
-            }
-        });
-    }
-
-    private void handleFullLyricsResponse(Response arResponse,
-                                          final Lyric arLoLyricModel,
-                                          final SongSearchCallback<Lyric> arCallback) throws IOException
-    {
-        final String loResponseHtml = arResponse.body().string();
-
-        Document doc = Jsoup.parse(loResponseHtml);
-        Elements loElements = doc.getElementsByClass(LYRICS_HTML_CLASS_NAME);
-
-        String loLyricsHtmlContent = "";
-
-        if (loElements.size() != 1)
-        {
-            // zero or more than one
-            Log.e(TAG, "Couldn't find lyrics");
-        }
-        else
-        {
-            loLyricsHtmlContent = loElements.get(0).getAllElements().html();
-        }
-
-        arLoLyricModel.setCompleteLyrics(loLyricsHtmlContent);
-
-        arCallback.onSongSearchCallback(HTTP_STATUS.OK, arLoLyricModel);
-    }
-
-    private void sendRequest(String arUrl,
-                             REQUEST_TYPE arRequestType,
-                             Callback arCallback)
+    private void sendRequest(@NonNull String arUrl,
+                             @NonNull final REQUEST_TYPE arRequestType,
+                             @NonNull final ApiCallback arCallback)
     {
         Log.v(TAG, "sendRequest() called with url " + arUrl);
 
@@ -201,19 +108,83 @@ public class LyricsApiService
                 .tag(arRequestType)
                 .build();
 
-        obOkHttpClient.newCall(loRequest).enqueue(arCallback);
+        obOkHttpClient.newCall(loRequest).enqueue(new Callback()
+        {
+            @Override
+            public void onFailure(@NonNull Call arCall,
+                                  @NonNull IOException arException)
+            {
+                // handle connectivity errors generally by
+                // handing it directly back to the ui layer
+                arCallback.onSongSearchCallback(HTTP_STATUS.NETWORK_ERROR, null);
+            }
+
+            @Override
+            public void onResponse(@NonNull Call arCall,
+                                   @NonNull Response arResponse) throws IOException
+            {
+                Object loParsedResponse = null;
+                HTTP_STATUS loStatusCode = HTTP_STATUS.getHttpStatusForCode(arResponse.code());
+
+                if (loStatusCode == HTTP_STATUS.OK)
+                {
+                    // only parse the response if the http code 200 (OK)
+                    String loResponseBody = arResponse.body().string();
+
+                    switch (arRequestType)
+                    {
+                        case APPLE_API_REQUEST:
+                            loParsedResponse = parseAppleApiResponse(loResponseBody);
+                            break;
+                        case LYRICS_METADATA_REQUEST:
+                            loParsedResponse = parseLyricMetadataResponse(loResponseBody);
+                            break;
+                        case COMPLETE_LYRICS_REQUEST:
+                            loParsedResponse = parseLyricResponse(loResponseBody);
+                            break;
+                    }
+                }
+
+                arCallback.onSongSearchCallback(loStatusCode, loParsedResponse);
+            }
+        });
     }
 
-    public interface SongSearchCallback<T>
+    private Lyric parseLyricMetadataResponse(String arResponseBody)
     {
-        void onSongSearchCallback(HTTP_STATUS arHttpStatus,
-                                  T arSongsListModel);
+        // for whatever reason the json response contains
+        // "song = " in front of it, so we need to remove it
+        arResponseBody = arResponseBody.replace("song = ", "");
+
+        final Lyric rvLyricModel = obGson.fromJson(arResponseBody, Lyric.class);
+
+        return rvLyricModel;
     }
 
-    public enum REQUEST_TYPE
+    private String parseLyricResponse(String arResponseBody)
     {
-        APPLE_API_REQUEST,
-        LYRICS_REQUEST,
-        COMPLETE_LYRICS_REQUEST
+        Document doc = Jsoup.parse(arResponseBody);
+        Elements loElements = doc.getElementsByClass(LYRICS_HTML_CLASS_NAME);
+
+        String rvLyrics = "";
+
+        if (loElements.size() != 1)
+        {
+            // zero or more than one
+            Log.e(TAG, "Couldn't find lyrics");
+        }
+        else
+        {
+            rvLyrics = loElements.get(0).getAllElements().html();
+        }
+
+        return rvLyrics;
+    }
+
+    private SongsListWrapper parseAppleApiResponse(String arResponseBody)
+    {
+        SongsListWrapper rvSongsListWrapper = obGson.fromJson(arResponseBody, SongsListWrapper.class);
+
+        return rvSongsListWrapper;
     }
 }

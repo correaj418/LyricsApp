@@ -38,8 +38,6 @@ public class Lyric
 
     //endregion
 
-    private Song obSongModel;
-
     //region constructor
 
     public Lyric(String arSongName,
@@ -94,21 +92,11 @@ public class Lyric
         return Html.fromHtml(obCompleteLyrics);
     }
 
-    public Song getSongModel()
-    {
-        return obSongModel;
-    }
-
     //region setters
 
     public void setCompleteLyrics(String arCompleteLyrics)
     {
         obCompleteLyrics = arCompleteLyrics;
-    }
-
-    public void setSongModel(Song arSongModel)
-    {
-        obSongModel = arSongModel;
     }
 
     //endregion

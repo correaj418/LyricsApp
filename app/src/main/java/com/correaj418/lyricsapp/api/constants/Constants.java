@@ -13,6 +13,13 @@ public class Constants
     public static final String LYRICS_NOT_FOUND_RESPONSE = "Not found";
     public static final String LYRICS_HTML_CLASS_NAME = "lyricbox";
 
+    public enum REQUEST_TYPE
+    {
+        APPLE_API_REQUEST,
+        LYRICS_METADATA_REQUEST,
+        COMPLETE_LYRICS_REQUEST
+    }
+
     public enum HTTP_STATUS
     {
         UNKNOWN_ERROR(-2),
