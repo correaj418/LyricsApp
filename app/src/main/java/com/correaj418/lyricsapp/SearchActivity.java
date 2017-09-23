@@ -55,11 +55,12 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
 
         ButterKnife.bind(this);
 
-        initToolbar("Lyrics");
+        initToolbar();
+
         setAdapter();
 
         // TODO
-        onQueryTextSubmit("brand new");
+//        onQueryTextSubmit("brand new");
     }
 
     //endregion
@@ -84,12 +85,12 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
         obLoadingDialog.dismiss();
     }
 
-    public void initToolbar(String title)
+    public void initToolbar()
     {
         setSupportActionBar(obToolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
-        getSupportActionBar().setTitle(title);
+//        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+//        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        getSupportActionBar().setTitle("Lyrics");
     }
 
     @Override
@@ -103,8 +104,7 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
         final SearchView searchView = (SearchView) MenuItemCompat
                 .getActionView(menu.findItem(R.id.action_search));
 
-        //changing edittext color
-        EditText searchEdit = ((EditText) searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text));
+        EditText searchEdit = searchView.findViewById(android.support.v7.appcompat.R.id.search_src_text);
         searchEdit.setTextColor(Color.WHITE);
         searchEdit.setHintTextColor(Color.WHITE);
         searchEdit.setBackgroundColor(Color.TRANSPARENT);

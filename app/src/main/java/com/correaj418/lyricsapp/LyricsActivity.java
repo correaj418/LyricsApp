@@ -46,7 +46,7 @@ public class LyricsActivity extends AppCompatActivity
 
         ButterKnife.bind(this);
 
-        initToolbar("Lyrics");
+//        initToolbar("Lyrics");
 
         obLyricModel = Parcels.unwrap(getIntent().getExtras().getParcelable("lyrics"));
 
@@ -64,7 +64,7 @@ public class LyricsActivity extends AppCompatActivity
     public void initToolbar(String title)
     {
         setSupportActionBar(toolbar);
-//        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setTitle(title);
     }
