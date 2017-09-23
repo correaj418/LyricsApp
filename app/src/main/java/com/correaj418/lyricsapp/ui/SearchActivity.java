@@ -118,21 +118,28 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
         LyricsApiService.instance().searchForTracks(arQuery, new SongSearchCallback<SongsListWrapper>()
         {
             @Override
-            public void onSongSearchCallback(HTTP_STATUS arHttpStatus,
-                                             SongsListWrapper arSongsListModel)
+            public void onSongSearchCallback(final HTTP_STATUS arHttpStatus,
+                                             final SongsListWrapper arSongsListModel)
             {
-                dismissLoadingDialog();
-
-                Log.d(TAG, "onSongSearchCallback returned status code " + arHttpStatus);
-
-                if (arHttpStatus == HTTP_STATUS.OK)
+                runOnUiThread(new Runnable()
                 {
-                    handleSongSearchResult(arSongsListModel);
-                }
-                else
-                {
-                    handleSongSearchFailure(arHttpStatus);
-                }
+                    @Override
+                    public void run()
+                    {
+                        dismissLoadingDialog();
+
+                        Log.d(TAG, "onSongSearchCallback returned status code " + arHttpStatus);
+
+                        if (arHttpStatus == HTTP_STATUS.OK)
+                        {
+                            handleSongSearchResult(arSongsListModel);
+                        }
+                        else
+                        {
+                            handleSongSearchFailure(arHttpStatus);
+                        }
+                    }
+                });
             }
         });
 
@@ -182,14 +189,21 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
         {
             @Override
             public void onSongSearchCallback(HTTP_STATUS arHttpStatus,
-                                             Lyric arLyricModel)
+                                             final Lyric arLyricModel)
             {
-                dismissLoadingDialog();
+                runOnUiThread(new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        dismissLoadingDialog();
 
-                Intent loLyricsActivityIntent = new Intent(SearchActivity.this, LyricsActivity.class)
-                        .putExtra(LYRICS_PARCEL_KEY, Parcels.wrap(arLyricModel));
+                        Intent loLyricsActivityIntent = new Intent(SearchActivity.this, LyricsActivity.class)
+                                .putExtra(LYRICS_PARCEL_KEY, Parcels.wrap(arLyricModel));
 
-                startActivity(loLyricsActivityIntent);
+                        startActivity(loLyricsActivityIntent);
+                    }
+                });
             }
         });
 
