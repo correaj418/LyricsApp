@@ -2,13 +2,14 @@ package com.correaj418.lyricsapp.api;
 
 import android.os.Handler;
 import android.os.Looper;
+import android.support.annotation.NonNull;
+import android.util.Log;
 
 import com.correaj418.lyricsapp.api.constants.Constants;
 import com.correaj418.lyricsapp.api.constants.Constants.HTTP_STATUS;
 import com.correaj418.lyricsapp.api.models.Lyric;
 import com.correaj418.lyricsapp.api.models.Song;
 import com.correaj418.lyricsapp.api.models.Song.SongsListWrapper;
-import com.correaj418.lyricsapp.api.utilities.Log;
 import com.google.gson.Gson;
 
 import org.jsoup.Jsoup;
@@ -24,7 +25,7 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 import static com.correaj418.lyricsapp.api.LyricsApiService.REQUEST_TYPE.APPLE_API_REQUEST;
-import static com.correaj418.lyricsapp.api.LyricsApiService.REQUEST_TYPE.FULL_LYRICS_REQUEST;
+import static com.correaj418.lyricsapp.api.LyricsApiService.REQUEST_TYPE.COMPLETE_LYRICS_REQUEST;
 import static com.correaj418.lyricsapp.api.LyricsApiService.REQUEST_TYPE.LYRICS_REQUEST;
 
 public class LyricsApiService
@@ -63,8 +64,8 @@ public class LyricsApiService
         sendRequest(loUrl, APPLE_API_REQUEST, new Callback()
         {
             @Override
-            public void onFailure(Call arCall,
-                                  IOException arException)
+            public void onFailure(@NonNull Call arCall,
+                                  @NonNull IOException arException)
             {
                 Log.e(TAG, arException.getMessage());
 
@@ -82,8 +83,8 @@ public class LyricsApiService
             }
 
             @Override
-            public void onResponse(Call arCall,
-                                   Response arResponse) throws IOException
+            public void onResponse(@NonNull Call arCall,
+                                   @NonNull Response arResponse) throws IOException
             {
                 final String loResponseJson = arResponse.body().string();
 
@@ -108,8 +109,8 @@ public class LyricsApiService
         sendRequest(arSongModel.toLyricsUrl(), LYRICS_REQUEST, new Callback()
         {
             @Override
-            public void onFailure(Call arCall,
-                                  IOException arException)
+            public void onFailure(@NonNull Call arCall,
+                                  @NonNull IOException arException)
             {
                 Log.e(TAG, arException.getMessage());
 
@@ -127,8 +128,8 @@ public class LyricsApiService
             }
 
             @Override
-            public void onResponse(Call arCall,
-                                   Response arResponse) throws IOException
+            public void onResponse(@NonNull Call arCall,
+                                   @NonNull Response arResponse) throws IOException
             {
                 REQUEST_TYPE loRequestType = (REQUEST_TYPE) arResponse.request().tag();
 
@@ -137,7 +138,7 @@ public class LyricsApiService
                     case LYRICS_REQUEST:
                         handleLyricsResponse(arResponse, arSongModel, arCallback);
                         break;
-                    case FULL_LYRICS_REQUEST:
+                    case COMPLETE_LYRICS_REQUEST:
                         break;
                     default:
                         // TODO
@@ -158,17 +159,19 @@ public class LyricsApiService
         final Lyric loLyricModel = obGson.fromJson(loResponseJson, Lyric.class);
         loLyricModel.setSongModel(arSongModel);
 
-        sendRequest(loLyricModel.getCompleteLyricsUrl(), FULL_LYRICS_REQUEST, new Callback()
+        sendRequest(loLyricModel.getCompleteLyricsUrl(), COMPLETE_LYRICS_REQUEST, new Callback()
         {
             @Override
-            public void onFailure(Call call, IOException e)
+            public void onFailure(@NonNull Call arCall,
+                                  @NonNull IOException arException)
             {
                 // TODO
-                Log.e(TAG, e.getMessage());
+                Log.e(TAG, arException.getMessage());
             }
 
             @Override
-            public void onResponse(Call call, Response response) throws IOException
+            public void onResponse(@NonNull Call arCall,
+                                   @NonNull Response arResponse) throws IOException
             {
                 Log.i(TAG, "");
 
@@ -178,14 +181,14 @@ public class LyricsApiService
                     Log.e(TAG, "No lyrics available");
                 }
 
-                handleFullLyricsResponse(response, loLyricModel, arCallback);
+                handleFullLyricsResponse(arResponse, loLyricModel, arCallback);
             }
         });
     }
 
     private void handleFullLyricsResponse(Response arResponse,
                                           final Lyric arLoLyricModel,
-                                          final SongSearchCallback arCallback) throws IOException
+                                          final SongSearchCallback<Lyric> arCallback) throws IOException
     {
         final String loResponseHtml = arResponse.body().string();
 
@@ -223,29 +226,6 @@ public class LyricsApiService
         });
     }
 
-    private void downloadCompleteLyrics(Lyric arLoLyricModel,
-                                        final Callback arCallback)
-    {
-        // todo - check that lyrics are available
-
-        sendRequest(arLoLyricModel.getCompleteLyricsUrl(), FULL_LYRICS_REQUEST, new Callback()
-        {
-            @Override
-            public void onFailure(Call arCall, IOException arException)
-            {
-                // TODO
-                arCallback.onFailure(arCall, arException);
-            }
-
-            @Override
-            public void onResponse(Call arCall,
-                                   Response arResponse) throws IOException
-            {
-                arCallback.onResponse(arCall, arResponse);
-            }
-        });
-    }
-
     private void sendRequest(String arUrl,
                              REQUEST_TYPE arRequestType,
                              Callback arCallback)
@@ -262,8 +242,6 @@ public class LyricsApiService
 
     public interface SongSearchCallback<T>
     {
-//        void onSongSearchCallback(HTTP_STATUS arHttpStatus,
-//                                  SongsListWrapper arSongsListModel);
         void onSongSearchCallback(HTTP_STATUS arHttpStatus,
                                   T arSongsListModel);
     }
@@ -272,6 +250,6 @@ public class LyricsApiService
     {
         APPLE_API_REQUEST,
         LYRICS_REQUEST,
-        FULL_LYRICS_REQUEST; // TODO - rename
+        COMPLETE_LYRICS_REQUEST
     }
 }

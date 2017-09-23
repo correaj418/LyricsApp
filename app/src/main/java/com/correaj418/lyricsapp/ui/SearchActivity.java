@@ -12,19 +12,19 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
-import com.correaj418.lyricsapp.api.constants.Constants.HTTP_STATUS;
+import com.correaj418.lyricsapp.R;
 import com.correaj418.lyricsapp.api.LyricsApiService;
 import com.correaj418.lyricsapp.api.LyricsApiService.SongSearchCallback;
+import com.correaj418.lyricsapp.api.constants.Constants.HTTP_STATUS;
 import com.correaj418.lyricsapp.api.models.Lyric;
 import com.correaj418.lyricsapp.api.models.Song;
 import com.correaj418.lyricsapp.api.models.Song.SongsListWrapper;
-import com.correaj418.lyricsapp.api.utilities.Log;
-import com.correaj418.lyricsapp.R;
 import com.correaj418.lyricsapp.ui.adapters.RecyclerViewAdapter;
 import com.correaj418.lyricsapp.ui.adapters.RecyclerViewAdapter.OnItemClickListener;
 
@@ -59,8 +59,8 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
 
         ButterKnife.bind(this);
 
-        initToolbar();
-
+        setSupportActionBar(obToolbar);
+        getSupportActionBar().setTitle(R.string.app_name);
         setAdapter();
 
         // TODO
@@ -68,13 +68,6 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
     }
 
     //endregion
-
-    public void initToolbar()
-    {
-        setSupportActionBar(obToolbar);
-        //noinspection ConstantConditions
-        getSupportActionBar().setTitle(R.string.app_name);
-    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu)

@@ -3,12 +3,12 @@ package com.correaj418.lyricsapp.ui;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.correaj418.lyricsapp.api.models.Lyric;
-import com.correaj418.lyricsapp.api.utilities.Log;
 import com.correaj418.lyricsapp.R;
+import com.correaj418.lyricsapp.api.models.Lyric;
 import com.squareup.picasso.Picasso;
 
 import org.parceler.Parcels;
@@ -18,9 +18,7 @@ import butterknife.ButterKnife;
 
 public class LyricsActivity extends AppCompatActivity
 {
-    private static String TAG = LyricsActivity.class.getSimpleName();
-
-    private Lyric obLyricModel;
+    private static final String TAG = LyricsActivity.class.getSimpleName();
 
     @BindView(R.id.lyrics_text_view)
     TextView obLyricsTextView;
@@ -47,24 +45,20 @@ public class LyricsActivity extends AppCompatActivity
 
         ButterKnife.bind(this);
 
-        obLyricModel = Parcels.unwrap(getIntent().getExtras().getParcelable("lyrics"));
+        // TODO - const
+        Lyric loLyricModel = Parcels.unwrap(getIntent().getExtras().getParcelable("lyrics"));
 
-        initToolbar("Lyrics for " + obLyricModel.getSongName());
+        setSupportActionBar(obToolbar);
+        getSupportActionBar().setTitle("Lyrics for " + loLyricModel.getSongName());
 
         Picasso.with(this)
-                .load(obLyricModel.getSongModel().getAlbumArtUrl())
+                .load(loLyricModel.getSongModel().getAlbumArtUrl())
                 .into(obAlbumCoverImageView);
 
-        obSongNameTextView.setText(obLyricModel.getSongName());
-        obArtistNameTextView.setText(obLyricModel.getArtistName());
-        obAlbumNameTextView.setText(obLyricModel.getSongModel().getAlbumName());
+        obSongNameTextView.setText(loLyricModel.getSongName());
+        obArtistNameTextView.setText(loLyricModel.getArtistName());
+        obAlbumNameTextView.setText(loLyricModel.getSongModel().getAlbumName());
 
-        obLyricsTextView.setText(obLyricModel.getCompleteLyricsAsHtml());
-    }
-
-    public void initToolbar(String title)
-    {
-        setSupportActionBar(obToolbar);
-        getSupportActionBar().setTitle(title);
+        obLyricsTextView.setText(loLyricModel.getCompleteLyricsAsHtml());
     }
 }

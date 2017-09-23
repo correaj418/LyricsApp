@@ -21,19 +21,7 @@ public class ExampleInstrumentedTest
     @Test
     public void useAppContext() throws Exception
     {
-//        LyricsApiService.instance()
-//                .searchForTracks("tom waits", new SongSearchCallback()
-//                {
-//                    @Override
-//                    public void onSongSearchCallback(int arStatusCode,
-//                                                     SongsListModel arSongsListModel)
-//                    {
-//                        // TODO - const
-//                        assertEquals(new Integer(arStatusCode), new Integer(0));
-//                    }
-//                });
 
-        lock.await(30000, TimeUnit.MILLISECONDS);
 
 //        // Context of the app under test.
 //        Context appContext = InstrumentationRegistry.getTargetContext();

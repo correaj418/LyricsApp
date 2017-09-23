@@ -9,8 +9,6 @@ import com.google.gson.annotations.SerializedName;
 import org.parceler.Parcel;
 import org.parceler.ParcelConstructor;
 
-import java.util.List;
-
 @Parcel
 public class Lyric
 {
@@ -26,9 +24,7 @@ public class Lyric
     @SerializedName("artist")
     private final String obArtistName;
 
-    // 'lyrics':'We saw the western coast\nI saw the hospital\nNurse the
-    // shoreline like a wound\nReports of lover\'s tryst\nWere neither
-    // clear nor descript\nWe kept it safe and slow\nThe qui[...]'
+    // 'lyrics':'[...]'
     @Expose
     @SerializedName("lyrics")
     private final String obPartialLyrics;
@@ -60,7 +56,7 @@ public class Lyric
                  String obArtistName,
                  String obPartialLyrics,
                  String obCompleteLyricsUrl,
-                 String obCompleteLyrics)
+                 @SuppressWarnings("SameParameterValue") String obCompleteLyrics)
     {
         this.obSongName = obSongName;
         this.obArtistName = obArtistName;
@@ -93,16 +89,6 @@ public class Lyric
         return obCompleteLyricsUrl;
     }
 
-    public String getCompleteLyrics()
-    {
-        return obCompleteLyrics;
-    }
-
-    public String getCompleteLyricsAsText()
-    {
-        return obCompleteLyrics;
-    }
-
     public Spanned getCompleteLyricsAsHtml()
     {
         return Html.fromHtml(obCompleteLyrics);
@@ -123,33 +109,6 @@ public class Lyric
     public void setSongModel(Song arSongModel)
     {
         obSongModel = arSongModel;
-    }
-
-    //endregion
-
-    //endregion
-
-    //region json list wrapper
-
-    public static class LyricsListWrapperModel
-    {
-        @Expose
-        @SerializedName("resultCount")
-        private int obResultCount;
-
-        @Expose
-        @SerializedName("results")
-        private List<Song> obSongResultsList;
-
-        public int getResultCount()
-        {
-            return obResultCount;
-        }
-
-        public List<Song> getSongResultsList()
-        {
-            return obSongResultsList;
-        }
     }
 
     //endregion

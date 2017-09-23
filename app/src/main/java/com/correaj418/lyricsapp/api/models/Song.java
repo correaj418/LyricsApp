@@ -29,14 +29,8 @@ public class Song
     @SerializedName("artworkUrl100")
     private final String obAlbumArtUrl;
 
-    // "collectionName": "Closing Time",
+    // "collectionName": "Closing Time"
     @Expose
-    @SerializedName("releaseDate")
-    private final String obReleaseDate;
-
-    // "releaseDate": "1973-03-01T08:00:00Z",
-    @Expose
-    // TODO - verify that this is mapped correctly
     @SerializedName("collectionName")
     private final String obAlbumName;
 
@@ -48,13 +42,11 @@ public class Song
     public Song(String obSongName,
                 String obArtistName,
                 String obAlbumArtUrl,
-                String obReleaseDate,
                 String obAlbumName)
     {
         this.obSongName = obSongName;
         this.obArtistName = obArtistName;
         this.obAlbumArtUrl = obAlbumArtUrl;
-        this.obReleaseDate = obReleaseDate;
         this.obAlbumName = obAlbumName;
     }
 
@@ -77,11 +69,6 @@ public class Song
         return obAlbumArtUrl;
     }
 
-    public String getReleaseDate()
-    {
-        return obReleaseDate;
-    }
-
     public String getAlbumName()
     {
         return obAlbumName;
@@ -93,7 +80,6 @@ public class Song
 
     public String toLyricsUrl()
     {
-        // TODO - sanitize url
         return String.format(Constants.LYRICS_API_URL, obArtistName, obSongName);
     }
 
@@ -103,7 +89,6 @@ public class Song
         return "\nSong Name: " + obSongName +
                 "\nArtist Name: " + obArtistName +
                 "\nAlbum Name: " + obAlbumArtUrl +
-                "\nRelease Date: " + obReleaseDate +
                 "\nAlbum Cover URL: " + obAlbumArtUrl;
     }
 

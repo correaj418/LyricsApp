@@ -20,7 +20,7 @@ import butterknife.ButterKnife;
 
 public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
 {
-    private static final String TAG = RecyclerViewAdapter.class.getSimpleName();
+//    private static final String TAG = RecyclerViewAdapter.class.getSimpleName();
 
     private List<Song> obSongModels;
 
@@ -94,7 +94,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                          Song arModel);
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder
+    class ViewHolder extends RecyclerView.ViewHolder
     {
         @BindView(R.id.album_cover_image_view)
         ImageView obAlbumCoverImageView;
@@ -105,7 +105,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         @BindView(R.id.album_name_text_view)
         TextView obAlbumNameTextView;
 
-        public ViewHolder(final View arItemView)
+        ViewHolder(final View arItemView)
         {
             super(arItemView);
 

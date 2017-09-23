@@ -15,7 +15,7 @@ public class Constants
 
         private final int obHttpStatus;
 
-        private HTTP_STATUS(int arHttpStatus)
+        HTTP_STATUS(int arHttpStatus)
         {
             obHttpStatus = arHttpStatus;
         }
