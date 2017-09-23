@@ -12,7 +12,7 @@ import org.parceler.ParcelConstructor;
 import java.util.List;
 
 @Parcel
-public class Lyrics
+public class Lyric
 {
     //region properties
 
@@ -42,23 +42,25 @@ public class Lyrics
 
     //endregion
 
+    private Song obSongModel;
+
     //region constructor
 
-    public Lyrics(String arSongName,
-                  String arArtistName,
-                  String arPartialLyrics,
-                  String arCompleteLyricsUrl)
+    public Lyric(String arSongName,
+                 String arArtistName,
+                 String arPartialLyrics,
+                 String arCompleteLyricsUrl)
     {
         this(arSongName, arArtistName, arPartialLyrics, arCompleteLyricsUrl, null);
     }
 
     @SuppressWarnings("WeakerAccess")
     @ParcelConstructor
-    public Lyrics(String obSongName,
-                  String obArtistName,
-                  String obPartialLyrics,
-                  String obCompleteLyricsUrl,
-                  String obCompleteLyrics)
+    public Lyric(String obSongName,
+                 String obArtistName,
+                 String obPartialLyrics,
+                 String obCompleteLyricsUrl,
+                 String obCompleteLyrics)
     {
         this.obSongName = obSongName;
         this.obArtistName = obArtistName;
@@ -91,6 +93,11 @@ public class Lyrics
         return obCompleteLyricsUrl;
     }
 
+    public String getCompleteLyrics()
+    {
+        return obCompleteLyrics;
+    }
+
     public String getCompleteLyricsAsText()
     {
         return obCompleteLyrics;
@@ -101,11 +108,21 @@ public class Lyrics
         return Html.fromHtml(obCompleteLyrics);
     }
 
+    public Song getSongModel()
+    {
+        return obSongModel;
+    }
+
     //region setters
 
     public void setCompleteLyrics(String arCompleteLyrics)
     {
         obCompleteLyrics = arCompleteLyrics;
+    }
+
+    public void setSongModel(Song arSongModel)
+    {
+        obSongModel = arSongModel;
     }
 
     //endregion

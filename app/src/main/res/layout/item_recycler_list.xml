@@ -18,7 +18,7 @@
                   android:background="#FFFFFF"
                   android:gravity="center_vertical"
                   android:orientation="horizontal"
-                  android:padding="12dp">
+                  android:padding="10dp">
 
         <ImageView
             android:id="@+id/album_cover_image_view"

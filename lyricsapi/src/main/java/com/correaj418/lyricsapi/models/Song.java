@@ -4,8 +4,12 @@ import com.correaj418.lyricsapi.Constants;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
+import org.parceler.Parcel;
+import org.parceler.ParcelConstructor;
+
 import java.util.List;
 
+@Parcel
 public class Song
 {
     //region properties
@@ -40,17 +44,18 @@ public class Song
 
     //region constructor
 
-    public Song(String arSongName,
-                String arArtistName,
-                String arAlbumArtUrl,
-                String arReleaseDate,
-                String arAlbumName)
+    @ParcelConstructor
+    public Song(String obSongName,
+                String obArtistName,
+                String obAlbumArtUrl,
+                String obReleaseDate,
+                String obAlbumName)
     {
-        obSongName = arSongName;
-        obArtistName = arArtistName;
-        obAlbumArtUrl = arAlbumArtUrl;
-        obReleaseDate = arReleaseDate;
-        obAlbumName = arAlbumName;
+        this.obSongName = obSongName;
+        this.obArtistName = obArtistName;
+        this.obAlbumArtUrl = obAlbumArtUrl;
+        this.obReleaseDate = obReleaseDate;
+        this.obAlbumName = obAlbumName;
     }
 
     //endregion

@@ -4,7 +4,7 @@ import android.os.Handler;
 import android.os.Looper;
 
 import com.correaj418.lyricsapi.Constants.HTTP_STATUS;
-import com.correaj418.lyricsapi.models.Lyrics;
+import com.correaj418.lyricsapi.models.Lyric;
 import com.correaj418.lyricsapi.models.Song;
 import com.correaj418.lyricsapi.models.Song.SongsListWrapper;
 import com.correaj418.lyricsapi.utilities.Log;
@@ -104,8 +104,8 @@ public class LyricsApiService
         });
     }
 
-    public void searchForLyrics(Song arSongModel,
-                                final SongSearchCallback<Lyrics> arCallback)
+    public void searchForLyrics(final Song arSongModel,
+                                final SongSearchCallback<Lyric> arCallback)
     {
         sendRequest(arSongModel.toLyricsUrl(), LYRICS_REQUEST, new Callback()
         {
@@ -137,7 +137,7 @@ public class LyricsApiService
                 switch (loRequestType)
                 {
                     case LYRICS_REQUEST:
-                        handleLyricsResponse(arResponse, arCallback);
+                        handleLyricsResponse(arResponse, arSongModel, arCallback);
                         break;
                     case FULL_LYRICS_REQUEST:
                         break;
@@ -151,14 +151,16 @@ public class LyricsApiService
     }
 
     private void handleLyricsResponse(Response arResponse,
-                                      final SongSearchCallback<Lyrics> arCallback) throws IOException
+                                      Song arSongModel,
+                                      final SongSearchCallback<Lyric> arCallback) throws IOException
     {
         // TODO - explain
         String loResponseJson = arResponse.body().string().replace("song = ", "");
 
-        final Lyrics loLyricsModel = obGson.fromJson(loResponseJson, Lyrics.class);
+        final Lyric loLyricModel = obGson.fromJson(loResponseJson, Lyric.class);
+        loLyricModel.setSongModel(arSongModel);
 
-        sendRequest(loLyricsModel.getCompleteLyricsUrl(), FULL_LYRICS_REQUEST, new Callback()
+        sendRequest(loLyricModel.getCompleteLyricsUrl(), FULL_LYRICS_REQUEST, new Callback()
         {
             @Override
             public void onFailure(Call call, IOException e)
@@ -172,19 +174,19 @@ public class LyricsApiService
             {
                 Log.i(TAG, "");
 
-                if (loLyricsModel.getPartialLyrics().equals("Not found"))
+                if (loLyricModel.getPartialLyrics().equals("Not found"))
                 {
                     // TODO -
                     Log.e(TAG, "No lyrics available");
                 }
 
-                handleFullLyricsResponse(response, loLyricsModel, arCallback);
+                handleFullLyricsResponse(response, loLyricModel, arCallback);
             }
         });
     }
 
     private void handleFullLyricsResponse(Response arResponse,
-                                          final Lyrics loLyricsModel,
+                                          final Lyric arLoLyricModel,
                                           final SongSearchCallback arCallback) throws IOException
     {
         final String loResponseHtml = arResponse.body().string();
@@ -209,7 +211,7 @@ public class LyricsApiService
             loLyricsHtmlContent = loElements.get(0).getAllElements().html();
         }
 
-        loLyricsModel.setCompleteLyrics(loLyricsHtmlContent);
+        arLoLyricModel.setCompleteLyrics(loLyricsHtmlContent);
 
         obMainThreadHandler.post(new Runnable()
         {
@@ -218,17 +220,17 @@ public class LyricsApiService
             {
                 // TODO - status codes
 
-                arCallback.onSongSearchCallback(OK, loLyricsModel);
+                arCallback.onSongSearchCallback(OK, arLoLyricModel);
             }
         });
     }
 
-    private void downloadCompleteLyrics(Lyrics loLyricsModel,
+    private void downloadCompleteLyrics(Lyric arLoLyricModel,
                                         final Callback arCallback)
     {
         // todo - check that lyrics are available
 
-        sendRequest(loLyricsModel.getCompleteLyricsUrl(), FULL_LYRICS_REQUEST, new Callback()
+        sendRequest(arLoLyricModel.getCompleteLyricsUrl(), FULL_LYRICS_REQUEST, new Callback()
         {
             @Override
             public void onFailure(Call arCall, IOException arException)

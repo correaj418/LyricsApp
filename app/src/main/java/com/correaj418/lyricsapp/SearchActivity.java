@@ -19,7 +19,7 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import com.correaj418.lyricsapi.Constants.HTTP_STATUS;
 import com.correaj418.lyricsapi.LyricsApiService;
 import com.correaj418.lyricsapi.LyricsApiService.SongSearchCallback;
-import com.correaj418.lyricsapi.models.Lyrics;
+import com.correaj418.lyricsapi.models.Lyric;
 import com.correaj418.lyricsapi.models.Song;
 import com.correaj418.lyricsapi.models.Song.SongsListWrapper;
 import com.correaj418.lyricsapi.utilities.Log;
@@ -177,6 +177,8 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
         obRecyclerView.scrollToPosition(0);
 
         obRecyclerViewAdapter.updateList(arSongsListModel.getSongResultsList());
+
+        onItemClick(null, 0, arSongsListModel.getSongResultsList().get(0));
     }
 
     private void handleSongSearchFailure(HTTP_STATUS arHttpStatus)
@@ -197,16 +199,16 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
         // TODO - handle click
         Log.v(TAG, "onItemClick for song " + arModel.toString());
 
-        LyricsApiService.instance().searchForLyrics(arModel, new SongSearchCallback<Lyrics>()
+        LyricsApiService.instance().searchForLyrics(arModel, new SongSearchCallback<Lyric>()
         {
             @Override
             public void onSongSearchCallback(HTTP_STATUS arHttpStatus,
-                                             Lyrics arLyricsModel)
+                                             Lyric arLyricModel)
             {
                 dismissLoadingDialog();
 
                 Intent loLyricsActivityIntent = new Intent(SearchActivity.this, LyricsActivity.class)
-                        .putExtra("lyrics", Parcels.wrap(arLyricsModel));
+                        .putExtra("lyrics", Parcels.wrap(arLyricModel));
 
                 startActivity(loLyricsActivityIntent);
             }
