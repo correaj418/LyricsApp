@@ -25,7 +25,7 @@ public class LyricsActivity extends AppCompatActivity
     TextView obLyricsTextView;
 
     @BindView(R.id.toolbar)
-    Toolbar toolbar;
+    Toolbar obToolbar;
 
     @BindView(R.id.album_cover_image_view)
     ImageView obAlbumCoverImageView;
@@ -46,9 +46,9 @@ public class LyricsActivity extends AppCompatActivity
 
         ButterKnife.bind(this);
 
-//        initToolbar("Lyrics");
-
         obLyricModel = Parcels.unwrap(getIntent().getExtras().getParcelable("lyrics"));
+
+        initToolbar("Lyrics for " + obLyricModel.getSongName());
 
         Picasso.with(this)
                 .load(obLyricModel.getSongModel().getAlbumArtUrl())
@@ -63,9 +63,7 @@ public class LyricsActivity extends AppCompatActivity
 
     public void initToolbar(String title)
     {
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        setSupportActionBar(obToolbar);
         getSupportActionBar().setTitle(title);
     }
 }

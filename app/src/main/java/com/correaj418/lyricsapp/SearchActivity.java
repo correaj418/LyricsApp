@@ -58,9 +58,6 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
         initToolbar();
 
         setAdapter();
-
-        // TODO
-//        onQueryTextSubmit("brand new");
     }
 
     //endregion
@@ -88,8 +85,6 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
     public void initToolbar()
     {
         setSupportActionBar(obToolbar);
-//        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-//        getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setTitle("Lyrics");
     }
 
@@ -177,8 +172,6 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
         obRecyclerView.scrollToPosition(0);
 
         obRecyclerViewAdapter.updateList(arSongsListModel.getSongResultsList());
-
-        onItemClick(null, 0, arSongsListModel.getSongResultsList().get(0));
     }
 
     private void handleSongSearchFailure(HTTP_STATUS arHttpStatus)
