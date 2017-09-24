@@ -120,8 +120,8 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
         obLyricsApi.getSongsForSearchTerm(arQuery, new ApiCallback<SongsListWrapper>()
         {
             @Override
-            public void onSongSearchCallback(final HTTP_STATUS arHttpStatus,
-                                             final SongsListWrapper arSongsListModel)
+            public void onApiCallback(final HTTP_STATUS arHttpStatus,
+                                      final SongsListWrapper arSongsListModel)
             {
                 runOnUiThread(new Runnable()
                 {
@@ -130,7 +130,7 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
                     {
                         dismissLoadingDialog();
 
-                        Log.d(TAG, "onSongSearchCallback returned status code " + arHttpStatus);
+                        Log.d(TAG, "onApiCallback returned status code " + arHttpStatus);
 
                         if (arHttpStatus == HTTP_STATUS.OK)
                         {
@@ -190,8 +190,8 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
         obLyricsApi.getLyricsForSong(arSongModel, new ApiCallback<Lyric>()
         {
             @Override
-            public void onSongSearchCallback(HTTP_STATUS arHttpStatus,
-                                             final Lyric arLyricModel)
+            public void onApiCallback(HTTP_STATUS arHttpStatus,
+                                      final Lyric arLyricModel)
             {
                 runOnUiThread(new Runnable()
                 {

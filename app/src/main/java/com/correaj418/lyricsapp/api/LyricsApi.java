@@ -55,30 +55,30 @@ public class LyricsApi
         sendRequest(arSongModel.toLyricsUrl(), LYRICS_METADATA_REQUEST, new ApiCallback<Lyric>()
         {
             @Override
-            public void onSongSearchCallback(HTTP_STATUS arHttpStatus,
-                                             final Lyric arSongsListModel)
+            public void onApiCallback(HTTP_STATUS arHttpStatus,
+                                      final Lyric arSongsListModel)
             {
                 if (arHttpStatus != HTTP_STATUS.OK)
                 {
-                    arCallback.onSongSearchCallback(arHttpStatus, null);
+                    arCallback.onApiCallback(arHttpStatus, null);
                     return;
                 }
 
                 sendRequest(arSongsListModel.getCompleteLyricsUrl(), COMPLETE_LYRICS_REQUEST, new ApiCallback<String>()
                 {
                     @Override
-                    public void onSongSearchCallback(HTTP_STATUS arHttpStatus,
-                                                     String arLyricsHtml)
+                    public void onApiCallback(HTTP_STATUS arHttpStatus,
+                                              String arLyricsHtml)
                     {
                         if (arHttpStatus != HTTP_STATUS.OK)
                         {
-                            arCallback.onSongSearchCallback(arHttpStatus, arSongsListModel);
+                            arCallback.onApiCallback(arHttpStatus, arSongsListModel);
                             return;
                         }
 
                         arSongsListModel.setCompleteLyrics(arLyricsHtml);
 
-                        arCallback.onSongSearchCallback(arHttpStatus, arSongsListModel);
+                        arCallback.onApiCallback(arHttpStatus, arSongsListModel);
                     }
                 });
             }
@@ -104,7 +104,7 @@ public class LyricsApi
             {
                 // handle connectivity errors generally by
                 // handing it directly back to the ui layer
-                arCallback.onSongSearchCallback(HTTP_STATUS.NETWORK_ERROR, null);
+                arCallback.onApiCallback(HTTP_STATUS.NETWORK_ERROR, null);
             }
 
             @Override
@@ -133,7 +133,7 @@ public class LyricsApi
                     }
                 }
 
-                arCallback.onSongSearchCallback(loStatusCode, loParsedResponse);
+                arCallback.onApiCallback(loStatusCode, loParsedResponse);
             }
         });
     }

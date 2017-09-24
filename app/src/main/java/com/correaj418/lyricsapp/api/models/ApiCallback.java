@@ -4,6 +4,6 @@ import com.correaj418.lyricsapp.api.constants.Constants.HTTP_STATUS;
 
 public interface ApiCallback<T>
 {
-    void onSongSearchCallback(HTTP_STATUS arHttpStatus,
-                              T arSongsListModel);
+    void onApiCallback(HTTP_STATUS arHttpStatus,
+                       T arResult);
 }
