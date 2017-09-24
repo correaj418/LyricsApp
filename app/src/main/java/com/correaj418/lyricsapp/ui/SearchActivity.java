@@ -115,6 +115,8 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
     @Override
     public boolean onQueryTextSubmit(String arQuery)
     {
+        // called after user hits search when the'yre done typing a query
+
         dismissKeyboard();
 
         obLyricsApi.getSongsForSearchTerm(arQuery, new ApiCallback<SongsListWrapper>()
@@ -167,6 +169,7 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
 
         if (arSongsListModel.getResultCount() == 0)
         {
+            // query didn't return any search results
             showMessageDialog(getString(R.string.no_results_found));
         }
     }
@@ -185,6 +188,8 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
     @Override
     public void onItemClick(View arView, int arPosition, final Song arSongModel)
     {
+        // called when the user clicks on an individual song to view the lyrics
+
         Log.v(TAG, "onItemClick for song " + arSongModel.toString());
 
         obLyricsApi.getLyricsForSong(arSongModel, new ApiCallback<Lyric>()
@@ -202,6 +207,9 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
 
                         if (arLyricModel.getCompleteLyricsAsHtml().toString().isEmpty())
                         {
+                            // if the lyrics html is empty it means that the wiki
+                            // lyrics api didn't have lyrics for this specific song
+
                             showMessageDialog(getString(R.string.could_not_find_lyrics));
 
                             return;
