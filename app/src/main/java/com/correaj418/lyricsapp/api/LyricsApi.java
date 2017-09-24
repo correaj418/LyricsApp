@@ -30,6 +30,9 @@ import static com.correaj418.lyricsapp.api.constants.Constants.REQUEST_TYPE.APPL
 import static com.correaj418.lyricsapp.api.constants.Constants.REQUEST_TYPE.COMPLETE_LYRICS_REQUEST;
 import static com.correaj418.lyricsapp.api.constants.Constants.REQUEST_TYPE.LYRICS_METADATA_REQUEST;
 
+/**
+ * TODO - At some point we may want to make this class into a service
+ */
 public class LyricsApi
 {
     private static final String TAG = LyricsApi.class.getSimpleName();
