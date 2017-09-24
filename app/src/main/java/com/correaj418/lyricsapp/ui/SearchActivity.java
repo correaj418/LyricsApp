@@ -178,7 +178,18 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
     {
         Log.e(TAG, "handleSongSearchFailure() called with status " + arHttpStatus);
 
-        showMessageDialog(getString(R.string.check_internet_connection));
+        switch (arHttpStatus)
+        {
+            case NETWORK_ERROR:
+                showMessageDialog(getString(R.string.check_internet_connection));
+                break;
+            case NOT_FOUND:
+                showMessageDialog(getString(R.string.could_not_find_lyrics));
+                break;
+            default:
+                showMessageDialog(getString(R.string.try_again_later));
+                break;
+        }
     }
 
     //endregion
@@ -195,7 +206,7 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
         obLyricsApi.getLyricsForSong(arSongModel, new ApiCallback<Lyric>()
         {
             @Override
-            public void onApiCallback(HTTP_STATUS arHttpStatus,
+            public void onApiCallback(final HTTP_STATUS arHttpStatus,
                                       final Lyric arLyricModel)
             {
                 runOnUiThread(new Runnable()
@@ -205,7 +216,14 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
                     {
                         dismissLoadingDialog();
 
-                        if (arLyricModel.getCompleteLyricsAsHtml().toString().isEmpty())
+                        if (arHttpStatus != HTTP_STATUS.OK)
+                        {
+                            handleSongSearchFailure(arHttpStatus);
+                            return;
+                        }
+
+                        if (arLyricModel == null || // this shouldn't be null, but just in case
+                                arLyricModel.getCompleteLyricsAsHtml().toString().isEmpty())
                         {
                             // if the lyrics html is empty it means that the wiki
                             // lyrics api didn't have lyrics for this specific song
