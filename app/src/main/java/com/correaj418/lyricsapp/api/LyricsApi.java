@@ -25,6 +25,7 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 import static com.correaj418.lyricsapp.api.constants.Constants.LYRICS_HTML_CLASS_NAME;
+import static com.correaj418.lyricsapp.api.constants.Constants.LYRICS_NOT_FOUND_RESPONSE;
 import static com.correaj418.lyricsapp.api.constants.Constants.REQUEST_TYPE.APPLE_API_REQUEST;
 import static com.correaj418.lyricsapp.api.constants.Constants.REQUEST_TYPE.COMPLETE_LYRICS_REQUEST;
 import static com.correaj418.lyricsapp.api.constants.Constants.REQUEST_TYPE.LYRICS_METADATA_REQUEST;
@@ -42,6 +43,16 @@ public class LyricsApi
         obGson = new Gson();
     }
 
+    /**
+     * Get a list of songs matching the search term
+     *
+     * <b>Uses Apple's iTunes API</b>
+     *
+     * @param arSearchTerm The term to query
+     * @param arCallback Callback for when the requests completes (success or failure)
+     *
+     * @see {@link com.correaj418.lyricsapp.api.models.ApiCallback}
+     */
     public void getSongsForSearchTerm(String arSearchTerm,
                                       final ApiCallback<SongsListWrapper> arCallback)
     {
@@ -49,22 +60,63 @@ public class LyricsApi
         sendRequest(loUrl, APPLE_API_REQUEST, arCallback);
     }
 
+    /**
+     * Get the lyrics for a song
+     *
+     * <b>Uses Wikia Lyric's API</b>
+     *
+     * <p>This method is a two step process:</p>
+     *
+     * <p>
+     * Step 1) Send a request to {@link Constants#LYRICS_API_URL}.
+     * This requests returns a JSON payload that contains a URL to
+     * the web page that contains the lyrics in the "url" field
+     *
+     * @see {@link Lyric#obCompleteLyricsUrl}
+     * </p>
+     *
+     * <p>
+     * Step 2) Use the url obtained from step 1 to download the HTML
+     * that contains the lyrics. This method requires us to parse HTML
+     * and extract the lyrics by assuming that theyre always going to
+     * be in the {@link Constants#LYRICS_HTML_CLASS_NAME} class. This
+     * probably won't work well in the long run so we may want to find some alternative
+     * </p>
+     *
+     * @param arSongModel The song that we're trying to get the lyrics for
+     * @param arCallback Callback for when the requests completes (success or failure)
+     *
+     * @see {@link com.correaj418.lyricsapp.api.models.ApiCallback}
+     */
     public void getLyricsForSong(final Song arSongModel,
                                  final ApiCallback<Lyric> arCallback)
     {
+        // step 1 - request the lyrics metadata
         sendRequest(arSongModel.toLyricsUrl(), LYRICS_METADATA_REQUEST, new ApiCallback<Lyric>()
         {
             @Override
             public void onApiCallback(HTTP_STATUS arHttpStatus,
-                                      final Lyric arSongsListModel)
+                                      final Lyric arLyricsModel)
             {
                 if (arHttpStatus != HTTP_STATUS.OK)
                 {
+                    // error in step 1
+                    // requests to the lyrics metadata returned an error
                     arCallback.onApiCallback(arHttpStatus, null);
                     return;
                 }
 
-                sendRequest(arSongsListModel.getCompleteLyricsUrl(), COMPLETE_LYRICS_REQUEST, new ApiCallback<String>()
+                if (arLyricsModel.getPartialLyrics().equals(LYRICS_NOT_FOUND_RESPONSE))
+                {
+                    // when lyrics for a song are not available the "lyrics"
+                    // field returns the string "Not found". we check for this
+                    // so that we can avoid sending the extra request if we don't need to
+                    arCallback.onApiCallback(arHttpStatus, arLyricsModel);
+                    return;
+                }
+
+                // step 2 - request the html that contains the lyrics
+                sendRequest(arLyricsModel.getCompleteLyricsUrl(), COMPLETE_LYRICS_REQUEST, new ApiCallback<String>()
                 {
                     @Override
                     public void onApiCallback(HTTP_STATUS arHttpStatus,
@@ -72,19 +124,28 @@ public class LyricsApi
                     {
                         if (arHttpStatus != HTTP_STATUS.OK)
                         {
-                            arCallback.onApiCallback(arHttpStatus, arSongsListModel);
+                            // error in step 2
+                            // requests to the lyrics HTML returned an error
+                            arCallback.onApiCallback(arHttpStatus, arLyricsModel);
                             return;
                         }
 
-                        arSongsListModel.setCompleteLyrics(arLyricsHtml);
+                        arLyricsModel.setCompleteLyrics(arLyricsHtml);
 
-                        arCallback.onApiCallback(arHttpStatus, arSongsListModel);
+                        arCallback.onApiCallback(arHttpStatus, arLyricsModel);
                     }
                 });
             }
         });
     }
 
+    /**
+     * Helper method for sending GET requests
+     *
+     * @param arUrl The url that we're trying to send the request to
+     * @param arRequestType The type of request
+     * @param arCallback Callback for the reques
+     */
     private void sendRequest(@NonNull String arUrl,
                              @NonNull final REQUEST_TYPE arRequestType,
                              @NonNull final ApiCallback arCallback)

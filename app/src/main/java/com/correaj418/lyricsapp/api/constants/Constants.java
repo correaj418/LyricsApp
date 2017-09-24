@@ -4,13 +4,23 @@ import android.util.SparseArray;
 
 public class Constants
 {
-    // https://itunes.apple.com/search?term=tom+waits
+    /**
+     * Returns a list of songs for the search term
+     * Example: https://itunes.apple.com/search?term=tom+waits
+     */
     public static final String APPLE_API_URL = "https://itunes.apple.com/search?term=%s";
 
-    // http://lyrics.wikia.com/api.php?func=getSong&amp;artist=Tom+Waits&amp;song=new+coat+of+paint&amp;fmt=json
+    /**
+     * Returns meta data for a song. Part of the data that is returned
+     * is the URL to the web page containing the song lyrics.
+     * There doesn't seem to be a public API for directly grabbing the
+     * lyrics so we need to use that URL to download the HTML and extra the lyrics
+     *
+     * Example: http://lyrics.wikia.com/api.php?func=getSong&amp;artist=Tom+Waits&amp;song=new+coat+of+paint&amp;fmt=json
+     */
     public static final String LYRICS_API_URL = "http://lyrics.wikia.com/api.php?func=getSong&artist=%s&song=%s&fmt=json";
 
-    public static final String LYRICS_NOT_FOUND_RESPONSE = "Not found";
+    public static final String LYRICS_NOT_FOUND_RESPONSE = "";
     public static final String LYRICS_HTML_CLASS_NAME = "lyricbox";
 
     public enum REQUEST_TYPE
